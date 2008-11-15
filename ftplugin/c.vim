@@ -69,13 +69,14 @@ set cinoptions=:0l1t0g0
 "  - reserve 4 columns on the left for folding tree
 "  - fold by syntax, use {}'s
 "  - start with all folds open
-if winwidth(0) > 80
-    set foldcolumn=4
-endif
+"if winwidth(0) > 80
+    "set foldcolumn=4
+"endif
 
 set fdm=syntax
-"syn region myFold start="{" end="}" transparent fold
-"%foldopen!
+syn region myFold start="{" end="}" transparent fold
+%foldopen!
+
 "  - bind meta< and meta> for fold colapse and extend
 "map <m-,> :foldclose<CR>
 "map <m-.> :foldopen<CR>
