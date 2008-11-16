@@ -1,6 +1,6 @@
 
 " todo: allow disabling and undo
-" (Claus Reinke, last modified: 02/06/2008)
+" (Claus Reinke, last modified: 18/07/2008)
 "
 " part of haskell plugins: http://www.cs.kent.ac.uk/~cr3/toolbox/haskell/Vim/
 " please send patches to <claus.reinke@talk21.com>
@@ -70,24 +70,29 @@ function! Haskell_GatherImports()
       let asPat     = '\(\s\+as\s\+'.modulePat.'\)\?'
       let hidingPat = '\(\s\+hiding\s*\((.*)\)\)\?'
       let listPat   = '\(\s*\((.*)\)\)\?'
-      let importPat = prefixPat.modulePat.asPat.hidingPat.listPat.'\s*$'
+      let importPat = prefixPat.modulePat.asPat.hidingPat.listPat ".'\s*$'
 
-      let [_,qualified,module,_,as,_,hiding,_,explicit;x] = matchlist(import,importPat)
-      let what = as=='' ? module : as
-      let hidings   = split(hiding[1:-2],',')
-      let explicits = split(explicit[1:-2],',')
-      let empty = {'lines':[],'hiding':hidings,'explicit':[],'modules':[]}
-      let entry = has_key(imports[1],what) ? imports[1][what] : deepcopy(empty)
-      let imports[1][what] = Haskell_MergeImport(deepcopy(entry),i,hidings,explicits,module)
-      if !(qualified=='qualified')
-        let imports[0][what] = Haskell_MergeImport(deepcopy(entry),i,hidings,explicits,module)
+      let ml = matchlist(import,importPat)
+      if ml!=[]
+        let [_,qualified,module,_,as,_,hiding,_,explicit;x] = ml
+        let what = as=='' ? module : as
+        let hidings   = split(hiding[1:-2],',')
+        let explicits = split(explicit[1:-2],',')
+        let empty = {'lines':[],'hiding':hidings,'explicit':[],'modules':[]}
+        let entry = has_key(imports[1],what) ? imports[1][what] : deepcopy(empty)
+        let imports[1][what] = Haskell_MergeImport(deepcopy(entry),i,hidings,explicits,module)
+        if !(qualified=='qualified')
+          let imports[0][what] = Haskell_MergeImport(deepcopy(entry),i,hidings,explicits,module)
+        endif
+      else
+        echoerr "Haskell_GatherImports doesn't understand: ".import
       endif
     endif
     let i+=1
   endwhile
   if !has_key(imports[1],'Prelude') 
-    let imports[0]['Prelude'] = {'lines':[]}
-    let imports[1]['Prelude'] = {'lines':[]}
+    let imports[0]['Prelude'] = {'lines':[],'hiding':[],'explicit':[],'modules':[]}
+    let imports[1]['Prelude'] = {'lines':[],'hiding':[],'explicit':[],'modules':[]}
   endif
   return imports
 endfunction

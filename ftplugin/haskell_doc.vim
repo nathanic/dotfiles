@@ -2,7 +2,7 @@
 " use haddock docs and index files
 " show documentation, complete & qualify identifiers 
 "
-" (Claus Reinke; last modified: 18/06/2008)
+" (Claus Reinke; last modified: 21/10/2008)
 " 
 " part of haskell plugins: http://www.cs.kent.ac.uk/~cr3/toolbox/haskell/Vim/
 " please send patches to <claus.reinke@talk21.com>
@@ -147,7 +147,7 @@ let s:haddock_indexfile = s:haddock_indexfiledir . 'haddock_index.vim'
 " to call, the second being the url).
 if !exists("g:haddock_browser_callformat")
   if has("win32") || has("win64")
-    let g:haddock_browser_callformat = 'start %s file://%s'
+    let g:haddock_browser_callformat = 'start %s "file://%s"'
   else
     if has("gui_running")
       let g:haddock_browser_callformat = '%s file://%s '.printf(&shellredir,'/dev/null').' &'
@@ -230,7 +230,8 @@ function! Doc(kind,qualname,...)
     let file = join(qual,'-') . suffix . relative . name
   endif
 
-  let path = s:libraries . package . file
+"  let path = s:libraries . package . file
+  let path = file
   call DocBrowser(path)
 endfunction
 
@@ -244,12 +245,14 @@ function! IDoc(name,...)
   let choices = HaddockIndexLookup(a:name)
   if choices=={} | return | endif
   if a:0==0
-    let choice = inputlist(keys(choices))
+    let keylist = map(deepcopy(keys(choices)),'substitute(v:val,"\\[.\\]","","")')
+    let choice = inputlist(keylist)
   else
     let choice = a:1
   endif
 
-  let path = s:libraries . values(choices)[choice]
+" let path = s:libraries . values(choices)[choice]
+  let path = values(choices)[choice] " assumes same order for keys/values..
   call DocBrowser(path)
 endfunction
 
@@ -289,9 +292,10 @@ function! MDoc(module)
     echoerr a:module 'not found in haddock module index'
     return
   endif
-  let package = g:haddock_moduleindex[a:module]
+  let package = g:haddock_moduleindex[a:module]['package']
   let file    = substitute(a:module,'\.','-','g') . suffix
-  let path    = s:libraries . package . '/' . file
+" let path    = s:libraries . package . '/' . file
+  let path    = g:haddock_moduleindex[a:module]['html']
   call DocBrowser(path)
 endfunction
 
@@ -304,17 +308,35 @@ endfunction
 " create a dictionary g:haddock_index, containing the haddoc index
 command! DocIndex call DocIndex()
 function! DocIndex()
-  let files   = split(globpath(s:libraries,'doc-index-*.html'),'\n')
+  let files   = split(globpath(s:libraries,'doc-index*.html'),'\n')
   "let files   = [s:libraries.'doc-index-33.html']
+  let g:haddock_index = {}
+  call ProcessHaddockIndexes2(s:libraries,files)
+  if GHC_VersionGE([6,8,2])
+    " TODO: escape * when?
+    let s:addon_libraries = split(system(g:ghc_pkg . ' field * haddock-html'),'\n')
+    for addon in s:addon_libraries
+      let ml = matchlist(addon,'haddock-html: \("\)\?\(file:///\)\?\([^"]*\)\("\)\?')
+      if ml!=[]
+        let [_,quote,file,addon_path;x] = ml
+        let addon_path = substitute(addon_path,'\(\\\\\|\\\)','/','g')
+        let addon_files = split(globpath(addon_path,'doc-index*.html'),'\n')
+        call ProcessHaddockIndexes2(addon_path,addon_files)
+      endif
+    endfor
+  endif
+  return 1
+endfunction
+
+function! ProcessHaddockIndexes(location,files)
   let entryPat= '.\{-}"indexentry"[^>]*>\([^<]*\)<\(\%([^=]\{-}TD CLASS="\%(indexentry\)\@!.\{-}</TD\)*\)[^=]\{-}\(\%(="indexentry\|TABLE\).*\)'
   let linkPat = '.\{-}HREF="\([^"]*\)".>\([^<]*\)<\(.*\)'
-  let g:haddock_index = {}
 
   redraw
-  echo 'populating g:haddock_index from haddock index files in ' s:libraries
-  for file in files  
-    echo file[len(s:libraries):]
-    let contents = join(readfile(file))
+  echo 'populating g:haddock_index from haddock index files in ' a:location
+  for f in a:files  
+    echo f[len(a:location):]
+    let contents = join(readfile(f))
     let ml = matchlist(contents,entryPat)
     while ml!=[]
       let [_,entry,links,r;x] = ml
@@ -324,7 +346,7 @@ function! DocIndex()
       while ml2!=[]
         let [_,l,m,links;x] = ml2
         "echo l m
-        let link[m] = l
+        let link[m] = a:location . '/' . l
         let ml2 = matchlist(links,linkPat)
       endwhile
       let g:haddock_index[DeHTML(entry)] = deepcopy(link)
@@ -332,7 +354,54 @@ function! DocIndex()
       let ml = matchlist(r,entryPat)
     endwhile
   endfor
-  return 1
+endfunction
+
+" concatenating all lines is too slow for a big file, process lines directly
+function! ProcessHaddockIndexes2(location,files)
+  let entryPat= '^>\([^<]*\)</'
+  let linkPat = '.\{-}A HREF="\([^"]*\)"'
+  let kindPat = '#\(.\)'
+
+  redraw
+  echo 'populating g:haddock_index from haddock index files in ' a:location
+  for f in a:files  
+    echo f[len(a:location):]
+    let isEntry = 0
+    let isLink  = ''
+    let link    = {}
+    let entry   = ''
+    for line in readfile(f)
+      if line=~'CLASS="indexentry' 
+        if (link!={}) && (entry!='')
+          let g:haddock_index[DeHTML(entry)] = deepcopy(link)
+          let link  = {}
+          let entry = ''
+        endif
+        let isEntry=1 
+        continue 
+      endif
+      if isEntry==1
+        let ml = matchlist(line,entryPat)
+        if ml!=[] | let [_,entry;x] = ml | let isEntry=0 | continue | endif
+      endif
+      if entry!=''
+        let ml = matchlist(line,linkPat)
+        if ml!=[] | let [_,isLink;x]=ml | continue | endif
+      endif
+      if isLink!=''
+        let ml = matchlist(line,entryPat)
+        if ml!=[] 
+          let [_,module;x] = ml 
+          let [_,kind;x]   = matchlist(isLink,kindPat)
+          let last         = a:location[strlen(a:location)-1]
+          let link[module."[".kind."]"] = a:location . (last=='/'?'':'/') . isLink
+          let isLink='' 
+          continue 
+        endif
+      endif
+    endfor
+    if link!={} | let g:haddock_index[DeHTML(entry)] = deepcopy(link) | endif
+  endfor
 endfunction
 
 command! ExportDocIndex call ExportDocIndex()
@@ -372,8 +441,17 @@ function! MkHaddockModuleIndex()
   for key in keys(g:haddock_index)
     let dict = g:haddock_index[key]
     for module in keys(dict)
-      let [_,package;x] = matchlist(dict[module],'^\([^\/]*\)\/')
-      let g:haddock_moduleindex[module] = package
+      let html = dict[module]
+      let ml = matchlist(html,'libraries/\([^\/]*\)\/')
+      if ml!=[]
+        let [_,package;x] = ml
+        let g:haddock_moduleindex[module] = {'package':package,'html':html}
+      endif
+      let ml = matchlist(html,'/\([^\/]*\)\/html/[A-Z]')
+      if ml!=[]
+        let [_,package;x] = ml
+        let g:haddock_moduleindex[module] = {'package':package,'html':html}
+      endif
     endfor
   endfor
 endfunction
@@ -410,11 +488,14 @@ function! Haddock()
   let name = unqual
   let dict = HaddockIndexLookup(name)
   if dict=={} | return | endif
-  let keys = ((qual=='')||(qual==asm[0])) ? keys(dict) : Haskell_ListIntersect(keys(dict),asm)
-  if (qual!='') && (qual==asm[0])
+  let keylist = map(deepcopy(keys(dict)),'substitute(v:val,"\\[.\\]","","")')
+  let keys = ((qual=='')||(asm==[])||(qual==asm[0])) ? keys(dict) 
+                                                   \ : Haskell_ListIntersect(keylist,asm)
+  if (qual!='') && (asm!=[]) && (qual==asm[0])
     for key in keys
       if key==qual
-        call DocBrowser(s:libraries . dict[key])
+        " call DocBrowser(s:libraries . dict[key])
+        call DocBrowser(dict[key])
       endif
     endfor
   elseif has("gui_running")
@@ -428,7 +509,8 @@ function! Haddock()
     let s:choices = keys
     let key = input('browse docs for '.name.' in: ','','customlist,CompleteAux')
     if key!=''
-      call DocBrowser(s:libraries . dict[key])
+      " call DocBrowser(s:libraries . dict[key])
+      call DocBrowser(dict[key])
     endif
   endif
 endfunction
@@ -491,12 +573,13 @@ function! CompleteHaddock(findstart, base)
     let qual = a:base =~ '^[A-Z][a-zA-Z0-9_'']*\(\.[A-Z][a-zA-Z0-9_'']*\)*\(\.[a-zA-Z0-9_'']*\)\?$'
     call HaveIndex() 
     for key in keys(g:haddock_index)
+      let keylist = map(deepcopy(keys(g:haddock_index[key])),'substitute(v:val,"\\[.\\]","","")')
       if (key[0 : l]==a:base)
-        for m in keys(g:haddock_index[key])
+        for m in keylist
           let res += [{"word":key,"menu":m,"dup":1}]
         endfor
       elseif qual " this tends to be slower
-        for m in keys(g:haddock_index[key])
+        for m in keylist
           let word = m . '.' . key
           if word[0 : l]==a:base
             let res += [{"word":word,"menu":m,"dup":1}]
@@ -506,12 +589,13 @@ function! CompleteHaddock(findstart, base)
     endfor
     if res==[] " no prefix matches, try CamelCase shortcuts
       for key in keys(g:haddock_index)
+        let keylist = map(deepcopy(keys(g:haddock_index[key])),'substitute(v:val,"\\[.\\]","","")')
         if CamelCase(a:base,key)
-          for m in keys(g:haddock_index[key])
+          for m in keylist
             let res += [{"word":key,"menu":m,"dup":1}]
           endfor
         elseif qual " this tends to be slower
-          for m in keys(g:haddock_index[key])
+          for m in keylist
             let word = m . '.' . key
             if CamelCase(a:base,word)
               let res += [{"word":word,"menu":m,"dup":1}]
@@ -549,8 +633,18 @@ function! Qualify()
   let i=0
   let dict   = HaddockIndexLookup(name)
   if dict=={} | return | endif
+  let keylist = map(deepcopy(keys(dict)),'substitute(v:val,"\\[.\\]","","")')
+  let imports = Haskell_GatherImports()
+  for qualifiedImport in keys(imports[1])
+    let c=0
+    for module in imports[1][qualifiedImport]['modules']
+      if Haskell_ListElem(keylist,module) | let c+=1 | endif
+    endfor
+    if c>0 | let keylist=[qualifiedImport]+keylist | endif
+  endfor
+  "let asm  = has_key(imports[1],qual) ? imports[1][qual]['modules'] : []
   if has("gui_running")
-    for key in keys(dict)
+    for key in keylist
       let lhs=escape(prefix.name,'/.|\')
       let rhs=escape(prefix.key.'.'.name,'/&|\')
       exe 'amenu ]Popup.'.escape(key,'\.').' :'.line.'s/'.lhs.'/'.rhs.'/<cr>:noh<cr>'
@@ -558,7 +652,7 @@ function! Qualify()
     endfor
     popup ]Popup
   else
-    let s:choices = keys(dict)
+    let s:choices = keylist
     let key = input('qualify '.name.' with: ','','customlist,CompleteAux')
     if key!=''
       let lhs=escape(prefix.name,'/.\')
@@ -569,10 +663,12 @@ function! Qualify()
   endif
 endfunction
 
-" create import for a (qualified) name
-map <LocalLeader>i :call Import(0)<cr>
-map <LocalLeader>im :call Import(1)<cr>
-function! Import(module)
+" create (qualified) import for a (qualified) name
+map <LocalLeader>i :call Import(0,0)<cr>
+map <LocalLeader>im :call Import(1,0)<cr>
+map <LocalLeader>iq :call Import(0,1)<cr>
+map <LocalLeader>iqm :call Import(1,1)<cr>
+function! Import(module,qualified)
   amenu ]Popup.- :echo '-'<cr>
   aunmenu ]Popup
   let namsym   = Haskell_GetNameSymbol(getline('.'),col('.'),0)
@@ -585,9 +681,10 @@ function! Import(module)
   let name       = unqual
   let pname      = ( symb ? '('.name.')' : name )
   let importlist = a:module ? '' : '('.pname.')'
+  let qualified  = a:qualified ? 'qualified ' : ''
 
   if qual!=''
-    exe 'call append(search(''\%1c\(\<import\>\|\<module\>\|{-# OPTIONS\|{-# LANGUAGE\)'',''nb''),''import '.qual.importlist.''')'
+    exe 'call append(search(''\%1c\(\<import\>\|\<module\>\|{-# OPTIONS\|{-# LANGUAGE\)'',''nb''),''import '.qualified.qual.importlist.''')'
     return
   endif
 
@@ -595,17 +692,18 @@ function! Import(module)
   let prefix = getline(line)[0:start-1]
   let dict   = HaddockIndexLookup(name)
   if dict=={} | return | endif
+  let keylist = map(deepcopy(keys(dict)),'substitute(v:val,"\\[.\\]","","")')
   if has("gui_running")
-    for key in keys(dict)
+    for key in keylist
       " exe 'amenu ]Popup.'.escape(key,'\.').' :call append(search("\\%1c\\(import\\\\|module\\\\|{-# OPTIONS\\)","nb"),"import '.key.importlist.'")<cr>'
-      exe 'amenu ]Popup.'.escape(key,'\.').' :call append(search(''\%1c\(\<import\>\\|\<module\>\\|{-# OPTIONS\\|{-# LANGUAGE\)'',''nb''),''import '.key.escape(importlist,'|').''')<cr>'
+      exe 'amenu ]Popup.'.escape(key,'\.').' :call append(search(''\%1c\(\<import\>\\|\<module\>\\|{-# OPTIONS\\|{-# LANGUAGE\)'',''nb''),''import '.qualified.key.escape(importlist,'|').''')<cr>'
     endfor
     popup ]Popup
   else
-    let s:choices = keys(dict)
+    let s:choices = keylist
     let key = input('import '.name.' from: ','','customlist,CompleteAux')
     if key!=''
-      exe 'call append(search(''\%1c\(\<import\>\|\<module\>\|{-# OPTIONS\|{-# LANGUAGE\)'',''nb''),''import '.key.importlist.''')'
+      exe 'call append(search(''\%1c\(\<import\>\|\<module\>\|{-# OPTIONS\|{-# LANGUAGE\)'',''nb''),''import '.qualified.key.importlist.''')'
     endif
   endif
 endfunction
@@ -617,4 +715,20 @@ function! HaddockIndexLookup(name)
     return {}
   endif
   return g:haddock_index[a:name]
+endfunction
+
+" copied from ghc.vim :-( should we move everything to using autoload instead?
+" we query the ghc version here, as we don't otherwise need it..
+function! GHC_VersionGE(target)
+  let s:ghc_version = substitute(system(g:ghc . ' --numeric-version'),'\n','','')
+  let current = split(g:ghc_version, '\.' )
+  let target  = a:target
+  for i in current
+    if ((target==[]) || (i>=target[0]))
+      let target = target[1:]
+    else
+      return 0
+    endif
+  endfor
+  return 1
 endfunction

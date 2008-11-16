@@ -1,4 +1,4 @@
-*haskellmode.txt*	Haskell Mode Plugins	05/07/2008
+*haskellmode.txt*	Haskell Mode Plugins	18/07/2008
 
 Authors:
     Claus Reinke <claus.reinke@talk21.com> ~
@@ -95,6 +95,8 @@ CONTENTS                                                         *haskellmode*
 |_.|                  qualify unqualified id under cursor
 |_i|                  add 'import <module>(<identifier>)' for id under cursor
 |_im|                 add 'import <module>' for id under cursor
+|_iq|                 add 'import qualified <module>(<identifier>)' for id under cursor
+|_iqm|                add 'import qualified <module>' for id under cursor
 |_ie|                 make imports explit for import statement under cursor
 |_opt|                add OPTIONS_GHC pragma
 |_lang|               add LANGUAGE pragma
@@ -280,8 +282,9 @@ CTRL-X CTRL-O           Standard insert-mode omni-completion based on the
     Haskell mode integrates with Haddock-generated HTML documentation,
     providing features such as navigating to the Haddock entry for the
     identifier under the cursor (|_?|), completion for the identifier under
-    the cursor (|i_CTRL-X_CTRL-U|), and adding import statements (|_i| |_im|)
-    or module qualifier (|_.|) for the identifier under the cursor.
+    the cursor (|i_CTRL-X_CTRL-U|), and adding import statements (|_i| |_im|
+    |_iq| |_iqm|) or module qualifier (|_.|) for the identifier under the
+    cursor.
 
     These commands operate on an internal Haddock index built from the
     platform's installed Haddock documentation for GHC's libraries. Since
@@ -348,21 +351,22 @@ _.                      Fully qualify the unqualified name under the cursor
                         selecting full qualifications from a popup menu (GUI)
                         or via command-line completion (CLI).
 
-                                                                          *_i*
-_i                      Add 'import <module>(<identifier>)' statement for the
+                                                                    *_iq* *_i*
+_i _iq                  Add 'import [qualified] <module>(<identifier>)'
+                        statement for the identifier under the cursor,
+                        selecting fully qualified modules from a popup menu
+                        (GUI) or via command-line completion (CLI), if the
+                        identifier is not qualified.  This currently adds one
+                        import statement per call instead of merging into
+                        existing import statements.
+
+                                                                  *_iqm* *_im*
+_im                     Add 'import [qualified] <module>' statement for the
                         identifier under the cursor, selecting fully qualified
                         modules from a popup menu (GUI) or via command-line
                         completion (CLI), if the identifier is not qualified.
                         This currently adds one import statement per call
                         instead of merging into existing import statements.
-
-                                                                         *_im*
-_im                     Add 'import <module>' statement for the identifier
-                        under the cursor, selecting fully qualified modules
-                        from a popup menu (GUI) or via command-line completion
-                        (CLI), if the identifier is not qualified.  This
-                        currently adds one import statement per call instead
-                        of merging into existing import statements.
 
                                                                          *_ie*
 _ie                     On an 'import <module>' line, in a correctly loadable
