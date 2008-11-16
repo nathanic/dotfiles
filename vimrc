@@ -181,3 +181,38 @@ set expandtab
 set smarttab
 set foldmethod=syntax
 set foldlevel=99
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" source explorer stuff
+" per http://www.vim.org/scripts/script.php?script_id=2179
+
+" // The switch of the Source Explorer
+nmap <F3> :SrcExplToggle<CR>
+" // Set the window height of Source Explorer
+let g:SrcExpl_winHeight = 8
+" // Set 100 ms for refreshing the Source Explorer
+let g:SrcExpl_refreshTime = 100
+" // Let the Source Explorer update the tags file when opening
+let g:SrcExpl_updateTags = 1
+" // Set "Enter" key to jump into the exact definition context
+let g:SrcExpl_jumpKey = "<ENTER>"
+" // Set "Space" key for back from the definition context
+let g:SrcExpl_gobackKey = "<SPACE>"
+
+" // In order to Avoid conflicts, the Source Explorer should know what plugins
+" // are using buffers. And you need add their bufname into the list below
+" // according to the command ":buffers!"
+let g:SrcExpl_pluginList = [
+        \ "__Tag_List__",
+        \ "_NERD_tree_",
+        \ "Source_Explorer"
+    \ ]
+
+" // Enable or disable local definition searching, and note that this is not
+" // guaranteed to work, the Source Explorer does not check the syntax for now,
+" // it only searches for a match with the keyword according to command 'gd'
+let g:SrcExpl_searchLocalDef = 1
+
+
