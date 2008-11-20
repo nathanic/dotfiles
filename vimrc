@@ -14,6 +14,7 @@ set incsearch           " do incremental searching
 set runtimepath+=/usr/share/vim/addons
 
 let g:haddock_browser = "/usr/bin/konqueror"
+let g:haddock_indexfiledir = "~/.vim/"
 
 " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
 let &guioptions = substitute(&guioptions, "t", "", "g")
@@ -110,10 +111,15 @@ map Q gq
 " Handy because it won't continue code comments.
 nmap <space> :put =''<cr>
 
-" In many terminal emulators the mouse works just fine, thus enable it.
+" IDE-ish plugins
+nmap <F1>  :TrinityToggleNERDTree<cr>
+nmap <F2>  :TrinityToggleTagList<cr>
+nmap <F3>  :TrinityToggleSourceExplorer<cr>
+
+" mouse is more annoying than helpful for the terminal
 set mouse=
 
-" dons' typeOf script
+" dons' haskell typeOf script
 map ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -181,38 +187,4 @@ set expandtab
 set smarttab
 set foldmethod=syntax
 set foldlevel=99
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" source explorer stuff
-" per http://www.vim.org/scripts/script.php?script_id=2179
-
-" // The switch of the Source Explorer
-nmap <F3> :SrcExplToggle<CR>
-" // Set the window height of Source Explorer
-let g:SrcExpl_winHeight = 8
-" // Set 100 ms for refreshing the Source Explorer
-let g:SrcExpl_refreshTime = 100
-" // Let the Source Explorer update the tags file when opening
-let g:SrcExpl_updateTags = 1
-" // Set "Enter" key to jump into the exact definition context
-let g:SrcExpl_jumpKey = "<ENTER>"
-" // Set "Space" key for back from the definition context
-let g:SrcExpl_gobackKey = "<SPACE>"
-
-" // In order to Avoid conflicts, the Source Explorer should know what plugins
-" // are using buffers. And you need add their bufname into the list below
-" // according to the command ":buffers!"
-let g:SrcExpl_pluginList = [
-        \ "__Tag_List__",
-        \ "_NERD_tree_",
-        \ "Source_Explorer"
-    \ ]
-
-" // Enable or disable local definition searching, and note that this is not
-" // guaranteed to work, the Source Explorer does not check the syntax for now,
-" // it only searches for a match with the keyword according to command 'gd'
-let g:SrcExpl_searchLocalDef = 1
-
 
