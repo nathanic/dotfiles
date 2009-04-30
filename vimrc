@@ -10,6 +10,11 @@ set ruler               " show the cursor position all the time
 set showcmd             " display incomplete commands
 set incsearch           " do incremental searching
 
+" statusline nicked from bberg
+"set statusline=%F%m%r%h%w\ [ff=%{&ff}]\ [ft=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v]\ [LEN=%L]
+set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)
+set laststatus=2  " always show status line
+
 " need this for vim-outliner on hardy
 set runtimepath+=/usr/share/vim/addons
 
@@ -96,6 +101,10 @@ nmap <s-f4> :cp<cr>
 " <c-]> jumps to the tag under the cursor;
 " <c-\> is my analogue for using :ptag
 nmap <c-\> :exe "silent! ptag " . expand("<cword>")<cr>
+
+" i find this clipboard access more convenient
+nmap \y "+y
+nmap \p "+p
 
 " cycle thru preview tags
 " inspired by http://www.ashberg.de/vim/vimrc.html
