@@ -196,4 +196,4 @@ set expandtab
 set smarttab
 set foldmethod=syntax
 set foldlevel=99
-
+set matchpairs+=<:>
