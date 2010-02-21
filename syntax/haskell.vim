@@ -1,4 +1,7 @@
 " Vim syntax file
+" fetched 2010-02-21 from this dude's github
+" http://github.com/urso/dotrc/blob/master/vim/syntax/haskell.vim
+"
 "
 " Modification of vims Haskell syntax file:
 "   - match types using regular expression
