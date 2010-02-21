@@ -125,6 +125,7 @@ nmap <F1>  :TrinityToggleNERDTree<cr>
 nmap <F2>  :TrinityToggleTagList<cr>
 nmap <F3>  :TrinityToggleSourceExplorer<cr>
 
+
 " mouse is more annoying than helpful for the terminal
 set mouse=
 
@@ -156,7 +157,7 @@ colorscheme koehler
 
 " this looks good on my x11 on hugin at least.
 "set guifont=Monospace\ Bold\ 11
-set guifont=DejaVu\ Sans\ Mono\ Bold\ 12
+set guifont=DejaVu\ Sans\ Mono\ 13
 
 " switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -197,3 +198,11 @@ set smarttab
 set foldmethod=syntax
 set foldlevel=99
 set matchpairs+=<:>
+
+
+
+" unmap \be
+" unmap \bs
+" unmap \bv
+" 
+" nmap \b :HSBufExplorer<cr>
