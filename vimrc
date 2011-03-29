@@ -1,5 +1,5 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Nathan's .vimrc.  Like it or lump it.
+" Nathan's vimrc.  Like it or lump it.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -18,6 +18,7 @@ set laststatus=2  " always show status line
 " need this for vim-outliner on hardy
 set runtimepath+=/usr/share/vim/addons
 
+" TODO: check platform, existence of binaries, etc.
 let g:haddock_browser = "/usr/bin/konqueror"
 let g:haddock_indexfiledir = "~/.vim/"
 
