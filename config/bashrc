@@ -271,10 +271,17 @@ function settitle() { echo -ne "\e]2;$@\a\e]1;$@\a"; }
 
 # keychain ssh key management (non-interactive)
 # TODO: just detect the files?  maybe keychain can auto-add.
-if [ -x /usr/bin/keychain ]; then  # todo: use which or something
-    #keychain --noask --quiet ~/.ssh/id_dsa
-    #keychain --quiet ~/.ssh/id_dsa ~/.ssh/id_rsa
-    keychain --quiet ~/.ssh/id_rsa # ~/.ssh/github.id_dsa
+if [ -x keychain ]; then  
+    # i really need to clean up my key filenames...
+    keychain --quiet --ignore_missing \
+        ~/.ssh/id_rsa                 \
+        ~/.ssh/id_dsa                 \
+        ~/.ssh/github.id_dsa          \
+        ~/.ssh/nathan_github.dsa      \
+        ~/.ssh/id_dsa.xenkibbutz      \
+        ~/.ssh/id_dsa.xenkibbutz-new  \
+        ~/.ssh/nathan-gitolite.dsa
+
     . ~/.keychain/${HOSTNAME}-sh
 fi
 
