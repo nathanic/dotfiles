@@ -33,7 +33,7 @@ export PATH=~/bin:~/hs/bin:$PATH
 export PYTHONPATH=~/lib/python
 
 # set up the p4 environment if possible
-[ -x ~/.p4_credentials ] && source ~/.p4_credentials
+[ -f ~/.p4_credentials ] && source ~/.p4_credentials
 
 # enable non-standard haskell features
 export HUGSFLAGS=-98
