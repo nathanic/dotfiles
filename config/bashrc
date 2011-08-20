@@ -301,7 +301,7 @@ if [ $HOSTNAME = nathan-imac ]; then
 fi 
 
 # automatically invoke screen if we're not in a session already
-if [ -x /usr/bin/screen ] && [ "$TERM" != "screen" ] && [ "$DISPLAY" != ":0" ]; then
+if [ -x screen ] && [ "$TERM" != "screen" ] && [ "$DISPLAY" != ":0" ] && [ "$DISPLAY" != ":0.0" ]; then
     # -xRR will attach without detaching other sessions
     screen -xRR
 fi
