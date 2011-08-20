@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+
+# 2011-08-20 
+# Set up symlinks to config files in my dotfiles repository.
+# expects to be run from the root of the dotfiles repository
+
+# the basic pattern is like
+#   ln -s dotfiles/config/foorc ~/.foorc
+#   ln -s ../dotfiles/bin/foo ~/bin/foo
+
+import sys, os
+
+op = os.path
+homedir = op.expanduser('~/')
+
+def linkAllInDir(srcdir, destdir, fileprefix=''):
+    if not op.isdir(destdir):
+        os.mkdir(destdir)
+    for f in os.listdir(srcdir):
+        src  = op.join(srcdir,f)
+        srcrel = op.relpath(src, destdir)
+        dest = op.join(destdir, fileprefix + f)
+
+        if op.islink(dest) and op.samefile(src, dest):
+            print 'ALREADY LINKED: %s is already linked to %s' % (dest, src)
+        elif op.exists(dest):
+            print 'EXISTS AND DIFFERS: destination %s already exists, not going to symlink it.' % dest
+        else:
+            print 'CREATING LINK: os.symlink(%s, %s)' % (srcrel, dest)
+            os.symlink(srcrel, dest)
+
+if __name__ == '__main__':
+    assert op.basename(os.getcwd()) == 'dotfiles'
+    linkAllInDir('config/', op.expanduser('~/'), fileprefix='.')
+    linkAllInDir('bin/', op.expanduser('~/bin/') )
