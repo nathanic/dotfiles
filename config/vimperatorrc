@@ -1,0 +1,15 @@
+"3.2 (created: 2011/06/03 11:51:34)
+
+nmap <C-1> :1tn<Return>
+nmap <C-2> :2tn<Return>
+nmap <C-3> :3tn<Return>
+nmap <C-4> :4tn<Return>
+nmap <C-5> :5tn<Return>
+nmap <C-6> :6tn<Return>
+nmap <C-7> :7tn<Return>
+nmap <C-8> :8tn<Return>
+nmap <C-9> :9tn<Return>
+nmap <C-0> :tablast<Return>
+source! /home/nathan/.vimperatorrc.local
+
+" vim: set ft=vimperator:

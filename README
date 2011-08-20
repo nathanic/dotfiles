@@ -1,0 +1,34 @@
+This is Nathan's dotfiles repository.
+The idea is to put everything valuable in ~/dotfiles, but symlink them from ~/.
+A helper script will take care of making the symlinks.
+
+Subdirectories:
+    bin:
+        useful homemade helper scripts/programs 
+        do we symlink each entry here into ~/bin/
+        or just add ~/dotfiles/bin/ to path?
+        the latter seems a bit better
+    config:
+        (top level dotfiles)
+        bashrc
+        inputrc
+        ackrc
+        screenrc
+        gitconfig
+        gitignore   # default .gitignore file
+        sshconfig   # .ssh/config  ?
+        vim:
+            the .vim directory
+            note that vimrc lives HERE
+    perhost:
+        files that are meant to be sourced on a per-host basis
+        ${HOSTNAME}.bashrc
+
+
+There will also be a script to set up all these symlinks.
+for each file to link:
+    if destination exists:
+        bitch
+    else:
+        ln -s $file $link
+

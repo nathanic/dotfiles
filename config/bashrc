@@ -1,0 +1,373 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# specify the One True Editor
+export EDITOR=/usr/bin/vim
+[ $HOSTNAME = dev1 ] && export EDITOR=/opt/sfw/bin/vim
+
+# various paths
+export CPATH=~/local/include/:$CPATH
+case $HOSTNAME in
+    hugin) 
+        export PATH=~/p/rb/arm-elf/bin:$PATH 
+        ;;
+    wintermute) 
+        export PATH=~/local/arm-elf/bin:$PATH 
+        ;;
+    dev1)
+        export PATH=/opt/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/ucb:$PATH
+        export PATH=~/hs/bin:~/python/bin:$PATH
+        ;;
+    nathan-xp) 
+        export PATH=$PATH:/c/ghc/ghc-6.8.1/bin/
+        export PATH=$PATH:"/c/Program Files/Sun/xVM VirtualBox"
+        ;;
+esac
+
+[ -d ~/.cabal/ ] && export PATH=~/.cabal/bin:$PATH
+[ -d ~/scripts/shell ] && export PATH=~/scripts/shell:$PATH
+# maybe a function pathadd() to encapsulate the above pattern?
+# pathcons, pathsnoc
+export PATH=~/bin:~/hs/bin:$PATH
+export PYTHONPATH=~/lib/python
+
+# set up the p4 environment if possible
+[ -x ~/.p4_credentials ] && source ~/.p4_credentials
+
+# enable non-standard haskell features
+export HUGSFLAGS=-98
+
+if [ $HOSTNAME = dev1 ]; then
+    # on solaris, have to force color
+    # NB: this is really hackish
+    case "$TERM" in
+        cygwin|xterm|xterm-*) TERM="xterm-color" ;;
+    esac 
+    # suggested by bcocks for some creator problem i forgot about.
+    export LD_LIBRARY_PATH=$HOME/hs/lib:/usr/dt/lib:/usr/local/lib:/usr/lib:/usr/sfw/lib/sparcv9:/usr/local/ssl/lib:/opt/sfw/lib/sparcv9:$ORACLE_HOME/lib:/opt/sfw/lib:/raid/0/pgsql/lib/:/raid/0/users2/afeick/local-gcc3.2/lib:$LD_LIBRARY_PATH
+    export P4CLIENT=nstien-dev1
+    # i have to export this so make(1) will see it and build right
+    export OSTYPE
+fi
+
+# nathan's phone bluetooth address
+export PHONE_ENV2_NATHAN=00:1F:6B:7D:5F:9B       
+export PHONE_ENV_LIZ=00:1E:75:B0:5A:B2
+export PHONE_ALLY_NATHAN=8C:54:1D:04:E0:8F
+
+# the rest of this only matters if this shell is interactive
+[ -z "$PS1" ] && return
+
+# don't put duplicate lines in the history. 
+# ... and ignore same sucessive entries.
+export HISTCONTROL=ignoreboth
+export HISTIGNORE="[   ]*:&:bg:fg:exit"
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# When changing directory small typos can be ignored by bash
+# for example, cd /vr/lgo/apaache would find /var/log/apache
+shopt -s cdspell
+
+# don't overwrite .bash_history
+shopt -s histappend
+
+# disable annoying console beep
+[ -x setterm ] && setterm -blength 0
+
+# make less more friendly for non-text input files, see lesspipe(1)
+# sets $LESSOPEN variable
+#[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
+[ -x $HOME/bin/lesspipe.sh ] && eval "$($HOME/bin/lesspipe.sh)"
+export LESS_ADVANCED_PREPROCESSOR=yes
+
+# ansi styling
+BOLD_ON="\[\e[1m\]"
+ITALICS_ON="\[\e[3m\]"
+UNDERLINE_ON="\[\e[4m\]"
+INVERSE_ON="\[\e[7m\]"
+STRIKETHROUGH_ON="\[\e[9m\]"
+BOLD_OFF="\[\e[22m\]"
+ITALICS_OFF="\[\e[23m\]"
+UNDERLINE_OFF="\[\e[24m\]"
+INVERSE_OFF="\[\e[27m\]"
+STRIKETHROUGH_OFF="\[\e[29m\]"
+
+PLAIN="\[\e[00m\]"
+RED="\[\e[31m\]"
+GREEN="\[\e[32m\]"
+YELLOW="\[\e[33m\]"
+BLUE="\[\e[34m\]"
+PURPLE="\[\e[35m\]"
+MAGENTA="\[\e[35m\]"
+CYAN="\[\e[36m\]"
+WHITE="\[\e[37m\]"
+BRIGHTBLUE="\[\e[01;34m\]"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+usercolor=$GREEN
+hostcolor=$GREEN
+curdircolor=$BRIGHTBLUE
+
+case "$HOSTNAME" in 
+    hugin)          hostcolor=$BLUE ;;
+    wintermute)     ;;
+    dev1)           hostcolor=$BOLD_ON$CYAN ;;
+    lildeb)         hostcolor=${BOLD_ON}${YELLOW} ;;
+    munin)          hostcolor=$RED ;;
+    nathan-imac)    hostcolor=$BOLD_ON$WHITE ;;
+    nathan-xp)      ;;
+    octavius)       ;;
+    xathan)         hostcolor=$MAGENTA ;;
+    gir)            ;;
+esac
+
+case "$USER" in
+    nathan|nstien|Nathan|"Nathan Stien") ;;
+    # NB: root should never get here, but this is to alert me in case.
+    root|Administrator) usercolor=$BOLD_ON$RED ;;
+    *)                  usercolor=$BOLD_ON$YELLOW ;;
+esac
+
+# idea: re-eval prompt colors on every prompt
+# do something interesting with pathcolor based on $PWD
+# maybe alter shade for outside of $HOME tree?
+# different color for network shares?
+# ! detect symlinks in the path and highlight them individually cyan? !
+    # split dir into components
+        # recursive method
+            # $ basename $(dirname $(dirname /foo/bar/baz/quux))
+            # bar
+    # pick highlight based on is_symlink
+    # implementation choices
+        # figure out how to do this in bash
+        # embed a small python script in bash
+            # then we require python for this feature
+                # [ -x $(which python) ] && do_python_thing
+            # performance: have to launch python every shell
+# any other highlighting of path nodes?  
+    # private dirs? (og-r)
+
+
+
+prefix=${debian_chroot:+($debian_chroot)}
+PS1="$prefix$usercolor\u$PLAIN$YELLOW@$hostcolor\h$PLAIN:$curdircolor\w$PLAIN$ "
+
+# non-color fallback for unknown terminals
+# TODO: find more reliable method of detecting color capability.
+case "$TERM" in
+    xterm-color|xterm|cygwin|linux|screen) ;;
+    *) PS1='${prefix}\u@\h:\w\$ ' ;;
+esac
+
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+#if [ -f ~/.bash_aliases ]; then
+#    . ~/.bash_aliases
+#fi
+
+# enable color support of ls and also add handy aliases
+if [ "$TERM" != "dumb" ]; then
+    eval "`dircolors -b`"
+    alias ls='ls --color=auto'
+    #alias dir='ls --color=auto --format=vertical'
+    #alias vdir='ls --color=auto --format=long'
+fi
+
+# some more ls aliases
+alias ll='ls -l'
+alias lh='ls -lh'
+alias lls='ls -lhSr'
+alias llh='ls -lh'
+alias la='ls -A'
+alias l='ls -CF'
+
+alias d0='export DISPLAY=:0'
+
+# 'less' passes ANSI colors
+alias less='less -R'
+
+alias clipget='xclip -selection clipboard -out'
+alias clipput='xclip -selection clipboard'
+alias dap='dcop amarok player'
+alias amadd='dcop amarok playlist addMedia'
+alias alert='play --silent /usr/share/sounds/phone.wav'
+
+alias ds='du -xs * | sort -n'   # find the piggies
+# human readable version of ds.  would have called it 'dsh', but that's already
+# taken by the distributed shell.
+alias dshr='du -sx * | sort -n | cut -f 2- | while read a; do du -hs "$a"; done' 
+alias dfh='df -h .'             # "dee eff here"
+
+# also interesting: http://princ3.wordpress.com/2007/01/28/exclude-directories-from-find/
+
+alias moutn=mount
+alias grep='grep --color'
+alias cgrep='grep --color=always'  # for use with pipes like less
+
+alias cack='ack --cc --cpp'
+alias ackl='ack --pager="less -R"'
+alias cackl='ack --cc --cpp --pager="less -R"'
+
+# remote copy (interactive); uses args like scp
+# can resume partial transfers, but requires remote rsync
+# note that -a means preserve attribs and do not follow symlinks
+# add --bwlimit=N to limit to N kbyte/sec
+alias rcopy='rsync -a --rsh=ssh --partial --progress'
+alias lancopy='rsync --bwlimit=1000 -a --rsh=ssh --partial --progress'
+alias slowcopy='rsync --bwlimit=100 -a --rsh=ssh --partial --progress'
+
+alias cleanpending='rm /home/nathan/store/bt/pending/*.torrent'
+
+# lancopy specifically to valis
+function valisify() {
+    rsync --bwlimit=1000 -a --rsh=ssh --partial --progress $* valis:/myth/videos
+}
+
+# lancopy specifically to boxee
+function boxify() {
+    rsync --bwlimit=1000 -a --partial --progress $* /media/boxee/
+}
+
+[ -d ~/p/haskell/tidbits ] && alias tb="pushd ~/p/haskell/tidbits"
+
+# misc. host-specifics
+if [ $HOSTNAME = lildeb ]; then
+    # silly hack for multi-ad workstation:
+    alias d0='export DISPLAY=localhost:10.0'
+    alias nxp='ssh octavius'
+elif [ $HOSTNAME = dev1 ]; then  # crappy solaris workarounds
+    alias wget='curl -O'
+    alias top='TERM=xterm top'
+    alias less='TERM=xterm less'
+fi
+
+# functional style "apply cmd arg0 [arg1 [...]]"
+# -> cmd arg0; cmd arg1; ...
+function apply () {
+    cmd=$1
+    shift
+    for x in $*; do $cmd $x; done
+}
+
+function settitle() { echo -ne "\e]2;$@\a\e]1;$@\a"; }
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+[ -f /etc/bash_completion ] && . /etc/bash_completion
+
+
+# keychain ssh key management (non-interactive)
+# TODO: just detect the files?  maybe keychain can auto-add.
+if [ -x /usr/bin/keychain ]; then  # todo: use which or something
+    #keychain --noask --quiet ~/.ssh/id_dsa
+    #keychain --quiet ~/.ssh/id_dsa ~/.ssh/id_rsa
+    keychain --quiet ~/.ssh/id_rsa # ~/.ssh/github.id_dsa
+    . ~/.keychain/${HOSTNAME}-sh
+fi
+
+# TODO: put this in with the env vars at the top
+# and don't supercede ~/bin!
+if [ $HOSTNAME = nathan-imac ]; then
+    # MacPorts Installer addition on 2008-09-03_at_15:04:11: adding an appropriate PATH variable for use with MacPorts.
+    export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+    # Finished adapting your PATH environment variable for use with MacPorts.
+    # MacPorts Installer addition on 2008-09-03_at_15:04:11: adding an appropriate MANPATH variable for use with MacPorts.
+    export MANPATH=/opt/local/share/man:$MANPATH
+    # Finished adapting your MANPATH environment variable for use with MacPorts.
+fi 
+
+# automatically invoke screen if we're not in a session already
+if [ -x /usr/bin/screen ] && [ "$TERM" != "screen" ] && [ "$DISPLAY" != ":0" ]; then
+    # -xRR will attach without detaching other sessions
+    screen -xRR
+fi
+
+# http://www.catonmat.net/blog/another-ten-one-liners-from-commandlinefu-explained
+nicemount() { (echo "DEVICE PATH TYPE FLAGS" && mount | awk '$2=$4="";1') | column -t; }
+wiki() { dig +short txt $1.wp.dg.cx; }
+
+# http://wiki.github.com/rupa/j
+
+# maintains a jump-list of directories you actually use
+# old directories eventually fall off the list
+# inspired by Joel Schaerer's http://wiki.github.com/joelthelion/autojump
+# and something similar i had - but i could never get the dir list right.
+#
+# INSTALL:
+#   source into .bashrc under your '[-z "$PS1" ] || return' line
+#   cd around for a while
+#
+# USE:
+#   j [--l] [regex1 ... regexn]
+#     regex1 ... regexn jump to the most used directory matching all masks
+#     --l               show the list instead of jumping
+#                       with no args, returns full list
+j() {
+ # change jfile if you already have a .j file for something else
+ local jfile=$HOME/.j
+ if [ "$1" = "--add" ]; then
+  shift
+  # we're in $HOME all the time, let something else get all the good letters
+  [ "$*" = "$HOME" ] && return
+  awk -v q="$*" -F"|" '
+   $2 >= 1 { 
+    if( $1 == q ) { l[$1] = $2 + 1; found = 1 } else l[$1] = $2
+    count += $2
+   }
+   END {
+    found || l[q] = 1
+    if( count > 1000 ) {
+     for( i in l ) print i "|" 0.9*l[i] # aging
+    } else for( i in l ) print i "|" l[i]
+   }
+  ' $jfile 2>/dev/null > $jfile.tmp
+  mv -f $jfile.tmp $jfile
+ elif [ "$1" = "" -o "$1" = "--l" ];then
+  shift
+  awk -v q="$*" -F"|" '
+   BEGIN { split(q,a," ") }
+   { for( i in a ) $1 !~ a[i] && $1 = ""; if( $1 ) print $2 "\t" $1 }
+  ' $jfile 2>/dev/null | sort -n
+ # for completion
+ elif [ "$1" = "--complete" ];then
+  awk -v q="$2" -F"|" '
+   BEGIN { split(substr(q,3),a," ") }
+   { for( i in a ) $1 !~ a[i] && $1 = ""; if( $1 ) print $1 }
+  ' $jfile 2>/dev/null
+ # if we hit enter on a completion just go there (ugh, this is ugly)
+ elif [[ "$*" =~ "/" ]]; then
+  local x=$*; x=/${x#*/}; [ -d "$x" ] && cd "$x"
+ else
+  # prefer case sensitive
+  local cd=$(awk -v q="$*" -F"|" '
+   BEGIN { split(q,a," ") }
+   { for( i in a ) $1 !~ a[i] && $1 = ""; if( $1 ) { print $2 "\t" $1; x = 1 } }
+   END {
+    if( x ) exit
+    close(FILENAME)
+    while( getline < FILENAME ) {
+     for( i in a ) tolower($1) !~ tolower(a[i]) && $1 = ""
+     if( $1 ) print $2 "\t" $1
+    }
+   }
+  ' $jfile 2>/dev/null | sort -nr | head -n 1 | cut -f 2)
+  [ "$cd" ] && cd "$cd"
+ fi
+}
+# bash completions for j
+complete -C 'j --complete "$COMP_LINE"' j
+# prepend to PROMPT_COMMAND
+PROMPT_COMMAND='j --add "$(pwd -P)";'"$PROMPT_COMMAND"

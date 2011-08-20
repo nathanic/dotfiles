@@ -1,0 +1,9 @@
+*.hi
+*.core
+*.*~
+*.o
+*.swo
+*.swp
+*.pyc
+*.pch
+.bzr

@@ -1,0 +1,9 @@
+[user]
+	name = Nathan Stien
+	email = nathanism@gmail.com
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+[alias]
+    st = status
