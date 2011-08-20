@@ -3,31 +3,31 @@
 # reniceall - like killall but nicer.  (renice a list of programs by name)
 # Probably there's already a program that does this, but meh.  Meh, I say!
 
-# Copyright (C) 2003 by Nathan P. Stien, released under the GNU GPL version 2
-# See http://www.fsf.org/licenses/gpl.html for terms.
-
+# Copyright 2011 Nathan P. Stien
+# originally written in 2003, redone in 2011 for shits/giggles
 
 import sys, os
 
-def findpids():
-    """ find all numeric entries in /proc/ and treat them as PID's. """
-    proc = os.listdir("/proc/")
+def isInt(x):
+    """ decide if a string can be parsed as an integer. """
+    try:
+        y = int(x)
+        return True
+    except ValueError:
+        return False
 
-    pids = []
-    for x in proc:
-        try:
-            pids.append(int(x))
-        except ValueError:
-            pass
-    return pids
-
-def get_process_name(pid):
+def getProcName(pid):
     """ read a process's name out of /proc/<pid>/status. """
-    f = file('/proc/%d/status' % pid,'r')
-    line = f.readline()
+    f = file('/proc/%s/status' % pid,'r')
+    line = f.readline()  # just read first line
     f.close()    
     assert line[:5] == 'Name:'
     return line[6:].strip()    
+
+def listProcs():
+    """ find all processes on the system, returned as (pid, name) pairs. """
+    return [ (pid, getProcName(pid)) for pid in os.listdir("/proc/") if isInt(pid) ]
+
 
 def main(argv):
     if len(argv) < 3:
@@ -44,13 +44,9 @@ def main(argv):
         sys.stderr.write('ERROR: Priority must be specified as an integer.')
         return -2       
     
-    pids = findpids()
-    pids_to_renice = []
-    for progname in argv[2:]:
-        for pid in pids:
-            if get_process_name(pid) == progname:
-                pids_to_renice.append(pid)
-    os.system('renice %d %s' % (priority, ' '.join(map(str,pids_to_renice))))
+    targetNames = argv[2:]
+    pids = [ pid for (pid,pname) in listProcs() if pname in targetNames ]
+    os.system('renice %d %s' % (priority, ' '.join(pids)))
     
 
 if __name__ == '__main__':
