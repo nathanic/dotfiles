@@ -1,0 +1,6 @@
+I am managing the files in my .vim with git.
+one day i would like to pull this in as a sub-branch of some uber-dotfile repo.
+
+.vimrc
+    lives in this dir so i can version it with other vim files
+    ~/.vimrc is a symlink
