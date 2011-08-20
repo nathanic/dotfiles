@@ -27,11 +27,14 @@ def linkAllInDir(srcdir, destdir, fileprefix=''):
             #print 'ALREADY LINKED: %s is already linked to %s' % (dest, src)
             pass
         elif op.exists(dest):
-            if filecmp.cmp(src, dest):
-                print 'EXISTS BUT HAS SAME CONTENTS AS DOTFILES: %s' % dest
-                removeable.append(dest)
-            else:
-                print 'EXISTS AND DIFFERS: %s  (not going to symlink it!)' % dest
+            if op.isfile(dest):
+                if filecmp.cmp(src, dest):
+                    print 'EXISTS BUT HAS SAME CONTENTS AS DOTFILES: %s' % dest
+                    removeable.append(dest)
+                else:
+                    print 'EXISTS AND DIFFERS: %s  (not going to symlink it!)' % dest
+            elif op.isdir(dest):
+                print 'EXISTS AND IS A DIRECTORY: %s (doing nothing, check it yourself).' % dest
         else:
             print 'CREATING LINK: ln -s %s %s' % (srcrel, dest)
             os.symlink(srcrel, dest)
