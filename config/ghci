@@ -1,0 +1,22 @@
+-- vi:ft=haskell:et:
+
+-- things i always want
+:m + Control.Monad Control.Applicative Debug.Trace Text.Printf System.IO.Unsafe Data.Maybe Data.List
+
+-- from the ghci manual, in analogy to shell dot-sourcing:
+:def . readFile
+-- e.g.   :. cmds.ghci
+
+-- http://www.haskell.org/haskellwiki/Hoogle#Using_Hoogle_from_GHCi
+:def hoogle \x -> return $ ":!hoogle -c " ++ x
+
+-- list surrounding lines at each breakpoint/step
+:set stop :list
+
+-- too many modules for the default prompt.
+:set prompt "ghci> "
+
+:set -fno-print-bind-result
+:set -XNoMonomorphismRestriction
+:set -fglasgow-exts
+-- :set +s      -- statistics (time,space)

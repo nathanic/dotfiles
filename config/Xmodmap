@@ -1,0 +1,4 @@
+! capslock becomes second esc key to make vim useful.
+! - nathan stien 2007-02-11
+remove Lock = Caps_Lock
+keysym Caps_Lock = Escape

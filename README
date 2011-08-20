@@ -16,7 +16,7 @@ Subdirectories:
         screenrc
         gitconfig
         gitignore   # default .gitignore file
-        sshconfig   # .ssh/config  ?
+        sshconfig   # MAYBE do .ssh/config  ?
         vim:
             the .vim directory
             note that vimrc lives HERE
