@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+
+# reniceall - like killall but nicer.  (renice a list of programs by name)
+# Probably there's already a program that does this, but meh.  Meh, I say!
+
+# Copyright (C) 2003 by Nathan P. Stien, released under the GNU GPL version 2
+# See http://www.fsf.org/licenses/gpl.html for terms.
+
+
+import sys, os
+
+def findpids():
+    """ find all numeric entries in /proc/ and treat them as PID's. """
+    proc = os.listdir("/proc/")
+
+    pids = []
+    for x in proc:
+        try:
+            pids.append(int(x))
+        except ValueError:
+            pass
+    return pids
+
+def get_process_name(pid):
+    """ read a process's name out of /proc/<pid>/status. """
+    f = file('/proc/%d/status' % pid,'r')
+    line = f.readline()
+    f.close()    
+    assert line[:5] == 'Name:'
+    return line[6:].strip()    
+
+def main(argv):
+    if len(argv) < 3:
+        print 'USAGE: %s priority prog0 [prog1 [prog2..]]' \
+                % os.path.split(argv[0])[1]
+        print 'This program will find all process matching the specified'
+        print 'command names and attempt to renice them to the specified'
+        print 'priority.  Hooray.'
+        return -1
+    
+    try:
+        priority = int(argv[1])
+    except ValueError:
+        sys.stderr.write('ERROR: Priority must be specified as an integer.')
+        return -2       
+    
+    pids = findpids()
+    pids_to_renice = []
+    for progname in argv[2:]:
+        for pid in pids:
+            if get_process_name(pid) == progname:
+                pids_to_renice.append(pid)
+    os.system('renice %d %s' % (priority, ' '.join(map(str,pids_to_renice))))
+    
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

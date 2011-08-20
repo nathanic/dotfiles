@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+
+"""
+Simple script to quotify each line from stdin.
+inspired by this ars technica article:
+http://arstechnica.com/articles/columns/linux/linux-20050822.ars
+"""
+
+import sys
+
+for line in sys.stdin:
+	print '"%s"' % line.replace('"', '\\"').rstrip('\r\n')

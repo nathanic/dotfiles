@@ -1,0 +1,3 @@
+#!/bin/sh
+# this is kinda shitty, need a more robust method
+ps -eaf | grep "$*" | grep -v grep
