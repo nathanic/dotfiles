@@ -8,3 +8,4 @@
 *.pch
 .bzr
 .netrwhist
+.DS_Store

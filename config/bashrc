@@ -13,7 +13,7 @@ case $HOSTNAME in
         export PATH=~/p/rb/arm-elf/bin:$PATH 
         ;;
     wintermute) 
-        export PATH=~/local/arm-elf/bin:$PATH 
+        export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
         ;;
     dev1)
         export PATH=/opt/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/ucb:$PATH
@@ -29,7 +29,7 @@ esac
 [ -d ~/scripts/shell ] && export PATH=~/scripts/shell:$PATH
 # maybe a function pathadd() to encapsulate the above pattern?
 # pathcons, pathsnoc
-export PATH=~/bin:~/hs/bin:$PATH
+export PATH=~/bin:$PATH
 export PYTHONPATH=~/lib/python
 
 # set up the p4 environment if possible
@@ -74,6 +74,10 @@ shopt -s cdspell
 
 # don't overwrite .bash_history
 shopt -s histappend
+
+shopt -s no_empty_cmd_completion
+shopt -s shift_verbose
+#shopt -s checkhash
 
 # disable annoying console beep
 [ -x setterm ] && setterm -blength 0

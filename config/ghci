@@ -20,3 +20,6 @@
 :set -XNoMonomorphismRestriction
 :set -fglasgow-exts
 -- :set +s      -- statistics (time,space)
+
+
+let tracify x = (trace $ "<pop "++show x++">") x
