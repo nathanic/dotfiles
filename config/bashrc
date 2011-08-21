@@ -58,6 +58,9 @@ if [ $HOSTNAME = dev1 ]; then
     # i have to export this so make(1) will see it and build right
     export OSTYPE
     export LD_ALTEXEC=/usr/ccs/bin/sparcv9/ld
+
+    # dev1 makes me do this manually, like a caveman
+    source ~/.bash_completion.d/git-completion.bash
 fi
 
 # nathan's phone bluetooth address
