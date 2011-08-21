@@ -2,6 +2,9 @@
 " Nathan's vimrc.  Like it or lump it.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" TODO: harvest good ideas from
+" http://stackoverflow.com/questions/164847/what-is-in-your-vimrc
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General behavioral settings
 set nocompatible        " vi sucks, long live vim
@@ -67,6 +70,9 @@ set autochdir
 command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
         \ | wincmd p | diffthis
 
+" work around a typo i make constantly
+:command W w
+
 " huzzah for doxygen
 :let g:load_doxygen_syntax=1
 
@@ -101,6 +107,10 @@ nmap <c-\> :exe "silent! ptag " . expand("<cword>")<cr>
 " i find this clipboard access more convenient
 nmap \y "+y
 nmap \p "+p
+
+" quick change buffers
+map <C-j> :bprev<CR>
+map <C-k> :bnext<CR>
 
 " cycle thru preview tags
 " inspired by http://www.ashberg.de/vim/vimrc.html
@@ -170,6 +180,10 @@ set wildmode=longest,full
 " highlight the current line
 " hmm, only seems to look good in the gui.
 set cursorline
+
+" highlight the word under cursor
+highlight flicker cterm=bold ctermfg=white
+au CursorMoved <buffer> exe 'match flicker /\V\<'.escape(expand('<cword>'), '/').'\>/'
 
 " highlight chars that go over the 80-column limit
 " inspired by http://drupal.org/node/29325#comment-213746
