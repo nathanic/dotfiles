@@ -315,8 +315,9 @@ if [ $HOSTNAME = nathan-imac ]; then
     # Finished adapting your MANPATH environment variable for use with MacPorts.
 fi 
 
+
 # automatically invoke screen if we're not in a session already
-if [ -x screen ] && [ "$TERM" != "screen" ] && [ "$DISPLAY" != ":0" ] && [ "$DISPLAY" != ":0.0" ]; then
+if [ -x `which screen` ] && [ "$TERM" != "screen" ] && [ "$DISPLAY" != ":0" ] && [ "$DISPLAY" != ":0.0" ]; then
     # -xRR will attach without detaching other sessions
     screen -xRR
 fi
