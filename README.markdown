@@ -3,14 +3,14 @@ Nathan's dotfiles repository
 
 This is how Nathan replicates his environment to all the machines he works on.  Feel free to steal anything useful.
 
+The idea is to put everything valuable in `~/dotfiles`, but symlink stuff wherever it would normally be.  A helper script sets up the links.
+
 ## Quick Install
 
     git clone git://github.com/nathanic/dotfiles.git
     cd dotfiles
     ./setup_links
 
-The idea is to put everything valuable in ~/dotfiles, but symlink them from ~/.
-A helper script will take care of making the symlinks.
 
 ## Subdirectory Organization
 
