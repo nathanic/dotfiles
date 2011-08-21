@@ -174,7 +174,12 @@ esac
 
 
 prefix=${debian_chroot:+($debian_chroot)}
-PS1="$prefix$usercolor\u$PLAIN$YELLOW@$hostcolor\h$PLAIN:$curdircolor\w$RED\$(__git_ps1)$PLAIN\$ "
+PS1="$prefix$usercolor\u$PLAIN$YELLOW@$hostcolor\h$PLAIN:$curdircolor\w$RED\$(__git_ps1 '(%s)')$PLAIN\$ "
+
+# extra git info
+GIT_PS1_SHOWDIRTYSTATE=1 #... untagged(*) and staged(+) changes
+GIT_PS1_SHOWSTASHSTATE=1 #... if something is stashed($)
+GIT_PS1_SHOWUNTRACKEDFILES=1 #... untracked files(%)
 
 # non-color fallback for unknown terminals
 # TODO: find more reliable method of detecting color capability.
