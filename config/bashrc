@@ -216,6 +216,7 @@ alias d0='export DISPLAY=:0'
 # 'less' passes ANSI colors
 alias less='less -R'
 
+alias updatebashrc='exec bash --login'
 alias clipget='xclip -selection clipboard -out'
 alias clipput='xclip -selection clipboard'
 alias dap='dcop amarok player'
