@@ -2,12 +2,15 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# play nice with others
+umask 002
+
 # specify the One True Editor
 export EDITOR=/usr/bin/vim
-[ $HOSTNAME = dev1 ] && export EDITOR=/opt/sfw/bin/vim
+[ $HOSTNAME = dev1 ] && export EDITOR=$HOME/bin/vim
 
 # various paths
-export CPATH=~/local/include/:$CPATH
+export CPATH=~/include:~/local/include/:$CPATH
 case $HOSTNAME in
     hugin) 
         export PATH=~/p/rb/arm-elf/bin:$PATH 
@@ -16,12 +19,17 @@ case $HOSTNAME in
         export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
         ;;
     dev1)
-        export PATH=/opt/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/ucb:$PATH
+        export PATH=$HOME/gcc-4.4.4/bin:/opt/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/ucb:/usr/local/bin:$PATH
         export PATH=~/hs/bin:~/python/bin:$PATH
         ;;
     nathan-xp) 
         export PATH=$PATH:/c/ghc/ghc-6.8.1/bin/
         export PATH=$PATH:"/c/Program Files/Sun/xVM VirtualBox"
+        ;;
+    octavius) 
+        #export PATH=$PATH:/c/ghc/ghc-6.8.1/bin/
+        export PATH=$PATH:/c/ghc/ghc-6.10.1/bin/
+        export PATH="/c/Program Files (x86)/Haskell/bin":$PATH:"/c/Program Files/Sun/xVM VirtualBox"
         ;;
 esac
 
@@ -40,15 +48,16 @@ export HUGSFLAGS=-98
 
 if [ $HOSTNAME = dev1 ]; then
     # on solaris, have to force color
-    # NB: this is really hackish
-    case "$TERM" in
-        cygwin|xterm|xterm-*) TERM="xterm-color" ;;
-    esac 
+    # this is really hackish
+    #case "$TERM" in
+    #    cygwin|xterm|xterm-*) TERM="xterm-color" ;;
+    #esac 
     # suggested by bcocks for some creator problem i forgot about.
-    export LD_LIBRARY_PATH=$HOME/hs/lib:/usr/dt/lib:/usr/local/lib:/usr/lib:/usr/sfw/lib/sparcv9:/usr/local/ssl/lib:/opt/sfw/lib/sparcv9:$ORACLE_HOME/lib:/opt/sfw/lib:/raid/0/pgsql/lib/:/raid/0/users2/afeick/local-gcc3.2/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$HOME/lib:$HOME/local/lib:$HOME/hs/lib:/usr/dt/lib:/usr/local/lib:/usr/lib:/usr/sfw/lib/sparcv9:/usr/ccs/lib:/usr/local/ssl/lib:/opt/sfw/lib/sparcv9:$ORACLE_HOME/lib:/opt/sfw/lib:/raid/0/pgsql/lib/:/raid/0/users2/afeick/local-gcc3.2/lib:$LD_LIBRARY_PATH
     export P4CLIENT=nstien-dev1
     # i have to export this so make(1) will see it and build right
     export OSTYPE
+    export LD_ALTEXEC=/usr/ccs/bin/sparcv9/ld
 fi
 
 # nathan's phone bluetooth address
@@ -253,8 +262,9 @@ if [ $HOSTNAME = lildeb ]; then
     alias nxp='ssh octavius'
 elif [ $HOSTNAME = dev1 ]; then  # crappy solaris workarounds
     alias wget='curl -O'
-    alias top='TERM=xterm top'
-    alias less='TERM=xterm less'
+    alias top='TERM=xterm top -c -C infinity'
+    alias less='TERM=xterm less -R'
+    alias vi=vim
 fi
 
 # functional style "apply cmd arg0 [arg1 [...]]"

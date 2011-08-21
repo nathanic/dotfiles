@@ -22,81 +22,77 @@ stderr = sys.stderr
 
 # i don't care about this warning
 warnings.filterwarnings('ignore', 
-	'tempnam is a potential security risk to your program',
-	RuntimeWarning)
+    'tempnam is a potential security risk to your program',
+    RuntimeWarning)
 
 def verify_files(filenames):
-	for filename in filenames:
-		if not os.path.isfile(filename) and not os.path.isdir(filename):
-			print >>stderr, 'Error: %s is not a file or directory!' % filename
-			return False
-	return True
+    for filename in filenames:
+        if not os.path.isfile(filename) and not os.path.isdir(filename):
+            print >>stderr, 'Error: %s is not a file or directory!' % filename
+            return False
+    return True
 
 def ask_new_names(filenames, editor):
-	""" spawn an editor and get new names.  returns list of new names.
-	returns None on error. """
+    """ spawn an editor and get new names.  returns list of new names.
+    returns None on error. """
 
-	# build a text file with all the names
-	tempfilename = os.tempnam()
-	f = file(tempfilename, 'w')
-	f.write('\n'.join(filenames))
-	f.close()
-	
-	os.system('%s %s' % (editor, tempfilename))
-	
-	newnames = []
-	for line in file(tempfilename):
-		newline = line.strip()
-		if len(newline):
-			newnames.append(newline)
+    # build a text file with all the names
+    tempfilename = os.tempnam()
+    f = file(tempfilename, 'w')
+    f.write('\n'.join(filenames))
+    f.close()
+    
+    os.system('%s %s' % (editor, tempfilename))
+    
+    newnames = []
+    for line in file(tempfilename):
+        newline = line.strip()
+        if len(newline):
+            newnames.append(newline)
 
-	os.unlink(tempfilename)
-	
-	if len(filenames) != len(newnames):
-		print >>stderr, 'Error: Counts of new and old filenames do not match!'
-		return None
-	
-	return newnames
+    os.unlink(tempfilename)
+    
+    if len(filenames) != len(newnames):
+        print >>stderr, 'Error: Counts of new and old filenames do not match!'
+        return None
+    
+    return newnames
 
 def rename_list(oldnames, newnames, verbose = False, dry_run = False):
-	""" rename the files in oldnames to corresponding entries in newnames. """
-	assert len(oldnames) == len(newnames)
-	for idx in range(len(oldnames)):
-		if verbose or dry_run:
-			print 'rename "%s" ->\n"%s"\n' % (oldnames[idx], newnames[idx])
-		if not dry_run:
-			os.rename(oldnames[idx], newnames[idx])
+    """ rename the files in oldnames to corresponding entries in newnames. """
+    assert len(oldnames) == len(newnames)
+    for idx in range(len(oldnames)):
+        if verbose or dry_run:
+            print 'rename "%s" ->\n"%s"\n' % (oldnames[idx], newnames[idx])
+        if not dry_run:
+            os.rename(oldnames[idx], newnames[idx])
 
 if __name__ == '__main__':
-	usage = 'usage: %prog [options] file0 [file1 [file2... [fileN]]]'
-	parser = OptionParser(usage)
-	
-	defaulteditor = os.environ.get('EDITOR', 'sensible-editor')
-  
-	parser.add_option('-e', '--editor', dest='editor',
-				  help='use this editor instead of default ($EDITOR or sensible-editor)',
-		  default=defaulteditor)
-	parser.add_option('-v', '--verbose',
-		  action='store_true', dest='verbose', default=False,
-		  help='show all rename operations')
-	parser.add_option('-d', '--dry-run',
-		  action='store_true', dest='dry_run', default=False,
-		  help='only show what would be done, don\'t do it.')
+    usage = 'usage: %prog [options] file0 [file1 [file2... [fileN]]]'
+    parser = OptionParser(usage)
 
-	options, filenames = parser.parse_args()
-	
-	if len(filenames) == 0:
-		parser.error('You need at least one file to do something.  Duh.')
-	
-	if not verify_files(filenames):
-		sys.exit(-1)
-	
-	newnames = ask_new_names(filenames, options.editor)
-	if not newnames:
-		sys.exit(-1)
-	
-	rename_list(filenames, newnames, options.verbose, options.dry_run)
+    defaulteditor = os.environ.get('EDITOR', 'sensible-editor')
 
+    parser.add_option('-e', '--editor', dest='editor',
+                  help='use this editor instead of default ($EDITOR or sensible-editor)',
+          default=defaulteditor)
+    parser.add_option('-v', '--verbose',
+          action='store_true', dest='verbose', default=False,
+          help='show all rename operations')
+    parser.add_option('-d', '--dry-run',
+          action='store_true', dest='dry_run', default=False,
+          help='only show what would be done, don\'t do it.')
 
+    options, filenames = parser.parse_args()
 
+    if len(filenames) == 0:
+        parser.error('You need at least one file to do something.  Duh.')
 
+    if not verify_files(filenames):
+        sys.exit(-1)
+
+    newnames = ask_new_names(filenames, options.editor)
+    if not newnames:
+        sys.exit(-1)
+
+    rename_list(filenames, newnames, options.verbose, options.dry_run)
