@@ -16,8 +16,9 @@ set visualbell t_vb=    " i hate beeping!
 set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)
 set laststatus=2  " always show status line
 
-" need this for vim-outliner on hardy
-set runtimepath+=/usr/share/vim/addons
+" needed this for vim-outliner on hardy
+" but it makes vim take like 5+ sec to start
+"set runtimepath+=/usr/share/vim/addons
 
 " TODO: check platform, existence of binaries, etc.
 let g:haddock_browser = "/usr/bin/konqueror"
@@ -35,13 +36,6 @@ if has("autocmd")
     " 'cindent' is on in C files, etc.
     " Also load indent files, to automatically do language-dependent indenting.
     filetype plugin indent on
-
-    " always set cwd to wherever the current buffer file is
-"    function! CHANGE_CURR_DIR()
-"        exec "cd %:p:h"
-"    endfunction
-
-"    autocmd BufEnter * call CHANGE_CURR_DIR()
 
     " Put these in an autocmd group, so that we can delete them easily.
     augroup vimrcEx

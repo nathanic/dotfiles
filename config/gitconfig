@@ -6,4 +6,4 @@
 	status = auto
 	branch = auto
 [alias]
-    st = status
+    st = status -sb

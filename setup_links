@@ -14,7 +14,7 @@ import filecmp
 op = os.path
 homedir = op.expanduser('~/')
 
-def linkAllInDir(srcdir, destdir, fileprefix=''):
+def linkAllInDir(srcdir, destdir, dryrun=False, fileprefix=''):
     removeable = []
     if not op.isdir(destdir):
         os.mkdir(destdir)
@@ -36,14 +36,22 @@ def linkAllInDir(srcdir, destdir, fileprefix=''):
             elif op.isdir(dest):
                 print 'EXISTS AND IS A DIRECTORY: %s (doing nothing, check it yourself).' % dest
         else:
-            print 'CREATING LINK: ln -s %s %s' % (srcrel, dest)
-            os.symlink(srcrel, dest)
+            if not dryrun:
+                print 'CREATING LINK: ln -s %s %s' % (srcrel, dest)
+                os.symlink(srcrel, dest)
+            else:
+                print 'DRY RUN: would do ln -s %s %s' % (srcrel, dest)
     return removeable
 
 if __name__ == '__main__':
     assert op.basename(os.getcwd()) == 'dotfiles'
-    removeable =  linkAllInDir('config/', op.expanduser('~/'), fileprefix='.')
-    removeable += linkAllInDir('bin/', op.expanduser('~/bin/') )
+    dryrun = '--dry-run' in sys.argv[1:]
+
+    if dryrun:
+        print 'NOTE: performing a DRY RUN.  no actual changes will be made.'
+
+    removeable =  linkAllInDir('config/', op.expanduser('~/'), dryrun, fileprefix='.')
+    removeable += linkAllInDir('bin/', op.expanduser('~/bin/'), dryrun)
 
     if removeable:
         print "\nThe following files already existed but had the same contents as the repo."
