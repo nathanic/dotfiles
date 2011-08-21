@@ -61,7 +61,7 @@ if [ $HOSTNAME = dev1 ]; then
 
     # dev1 makes me do this manually, like a caveman
     source ~/.bash_completion.d/git-completion.bash
-elif [ $HOSTNAME = cs1 ]; then
+elif [ $HOSTNAME = cs1.multi-ad.com ]; then
     # so does cs1
     source ~/.bash_completion.d/git-completion.bash
 fi
