@@ -22,11 +22,6 @@ case $HOSTNAME in
         export PATH=$HOME/gcc-4.4.4/bin:/opt/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/ucb:/usr/local/bin:$PATH
         export PATH=~/hs/bin:~/python/bin:$PATH
         ;;
-    cs1)
-        export C_COMPILER=colorgcc
-        export CPP_COMPILER=colorgcc
-        export CC=colorgcc
-        ;;
     nathan-xp) 
         export PATH=$PATH:/c/ghc/ghc-6.8.1/bin/
         export PATH=$PATH:"/c/Program Files/Sun/xVM VirtualBox"
