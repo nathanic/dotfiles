@@ -61,6 +61,9 @@ if [ $HOSTNAME = dev1 ]; then
 
     # dev1 makes me do this manually, like a caveman
     source ~/.bash_completion.d/git-completion.bash
+elif [ $HOSTNAME = cs1]; then
+    # so does cs1
+    source ~/.bash_completion.d/git-completion.bash
 fi
 
 # nathan's phone bluetooth address
