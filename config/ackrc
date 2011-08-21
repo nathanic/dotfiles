@@ -1,4 +1,4 @@
 --type-set=perl=.pl,.pm,.pod,.t,.cgi,.mp
---type-set=cpp=.h,.c,.cpp,.cp
+--type-set=cpp=.h,.c,.cpp,.cp,.hpp
 --type-set=haskell=.hs,.lhs,.chs
 --type-set=masitemplates=..thtml,.temail
