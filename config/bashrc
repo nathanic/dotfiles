@@ -171,7 +171,7 @@ esac
 
 
 prefix=${debian_chroot:+($debian_chroot)}
-PS1="$prefix$usercolor\u$PLAIN$YELLOW@$hostcolor\h$PLAIN:$curdircolor\w$PLAIN$ "
+PS1="$prefix$usercolor\u$PLAIN$YELLOW@$hostcolor\h$PLAIN:$curdircolor\w$RED\$(__git_ps1)$PLAIN\$ "
 
 # non-color fallback for unknown terminals
 # TODO: find more reliable method of detecting color capability.
