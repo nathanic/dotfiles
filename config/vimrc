@@ -182,8 +182,8 @@ set wildmode=longest,full
 set cursorline
 
 " highlight the word under cursor
-highlight flicker cterm=bold ctermfg=white
-au CursorMoved <buffer> exe 'match flicker /\V\<'.escape(expand('<cword>'), '/').'\>/'
+"highlight flicker cterm=bold ctermfg=white
+"au CursorMoved <buffer> exe 'match flicker /\V\<'.escape(expand('<cword>'), '/').'\>/'
 
 " highlight chars that go over the 80-column limit
 " inspired by http://drupal.org/node/29325#comment-213746
