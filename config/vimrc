@@ -87,6 +87,9 @@ let g:haddock_indexfiledir = "~/.vim/"
 " huzzah for doxygen
 let g:load_doxygen_syntax=1
 
+" don't spam me for not having ruby
+let g:LustyExplorerSuppressRubyWarning = 1
+
 " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
 let &guioptions = substitute(&guioptions, "t", "", "g")
 " also just ditch the toolbar, since it adds nothing to a keyboard-driven app
