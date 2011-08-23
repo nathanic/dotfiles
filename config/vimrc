@@ -11,12 +11,12 @@
 " General behavioral settings
 
 " use pathogen for sanity
-filetype off
-call pathogen#infect()
+call pathogen#runtime_append_all_bundles()
 filetype plugin indent on
 
 set nocompatible        " vi sucks, long live vim
-set history=50          " keep 50 lines of command line history
+set history=1000        " longer command history
+set undolevels=1000     " so much undo
 set ruler               " show the cursor position all the time
 set showcmd             " display incomplete commands
 set incsearch           " do incremental searching
@@ -117,10 +117,7 @@ if has("autocmd")
         au!
 
         " Show invisible characters in all of these files
-        autocmd filetype vim setlocal list
-        autocmd filetype perl setlocal list
-        autocmd filetype python,rst setlocal list
-        autocmd filetype ruby setlocal list
+        autocmd filetype vim,c,cpp,perl,haskell,make,python,rst,ruby setlocal list
         autocmd filetype javascript,css setlocal list
     augroup end "}}}
 
