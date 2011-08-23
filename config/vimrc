@@ -2,43 +2,104 @@
 " Nathan's vimrc.  Like it or lump it.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" TODO: harvest good ideas from
+" TODO: harvest more good ideas from these
 " http://stackoverflow.com/questions/164847/what-is-in-your-vimrc
+" http://nvie.com/posts/how-i-boosted-my-vim/
+" http://stevelosh.com/blog/2010/09/coming-home-to-vim/
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General behavioral settings
+
+" use pathogen for sanity
+filetype off
+call pathogen#infect()
+filetype plugin indent on
+
 set nocompatible        " vi sucks, long live vim
 set history=50          " keep 50 lines of command line history
 set ruler               " show the cursor position all the time
 set showcmd             " display incomplete commands
 set incsearch           " do incremental searching
+set hlsearch            " highlight search matches
+set smartcase           " search case-insensitive if all lower
 set visualbell t_vb=    " i hate beeping!
+set noerrorbells        " still hate beeping!
+set hidden              " hide rather than delete buffers
+set autochdir           " change to the directory of the active buffer
+set showmatch           " show matching parens
+set backspace=indent,eol,start  " backspace everything in insert mode
+set title               " change terminal title
+set scrolloff=4         " keep 4 lines off the edges of the screen when scrolling
 
-" statusline nicked from bberg
-"set statusline=%F%m%r%h%w\ [ff=%{&ff}]\ [ft=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v]\ [LEN=%L]
 set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)
-set laststatus=2  " always show status line
+set laststatus=2        " always show status line
 
-" needed this for vim-outliner on hardy
-" but it makes vim take like 5+ sec to start
-"set runtimepath+=/usr/share/vim/addons
+"TODO: investigate these
+set backupdir=./.backup,.,~/tmp   " keep *~ out of .
+" if . is not writable, put *.swp elsewhere.
+set directory=.,./.backup,~/tmp/
+
+set mouse=              " disable mouse usage in terminal
+
+set wildmenu            " show a listing of wildcard completions
+set wildmode=longest,full " make completion more bash-like
+set wildignore=*.swp,*.bak,*.pyc,*.class,*.o
+
+set clipboard=unnamed   " use gui clipboard if possible
+
+
+
+set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·
+set nolist                      " don't show invisible characters by default,
+                                " but it is enabled for some file types (see later)
+
+" python, haskell, and softtabstop have made me a spaces man
+set autoindent
+set copyindent          " preserve structure of previous indent
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab           " write spaces instead of \t
+set smarttab
+set foldmethod=syntax
+set foldlevel=99
+set matchpairs+=<:>
+
+set pastetoggle=<f12>   " quick toggle for paste mode
+
+if &t_Co > 2 || has("gui_running")
+    syntax on          " enable syntax highlighting
+endif
+
+if has("gui_running")
+    " only looks good in the GUI
+    set cursorline          " highlight the current line
+endif
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Configuration variables
 
 " TODO: check platform, existence of binaries, etc.
 let g:haddock_browser = "/usr/bin/konqueror"
 let g:haddock_indexfiledir = "~/.vim/"
+" huzzah for doxygen
+let g:load_doxygen_syntax=1
 
 " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
 let &guioptions = substitute(&guioptions, "t", "", "g")
 " also just ditch the toolbar, since it adds nothing to a keyboard-driven app
 let &guioptions = substitute(&guioptions, "T", "", "g")
 
-" Only do this part when compiled with support for autocommands.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Auto Commands
 if has("autocmd")
     " Enable file type detection.
     " Use the default filetype settings, so that mail gets 'tw' set to 72,
     " 'cindent' is on in C files, etc.
-    " Also load indent files, to automatically do language-dependent indenting.
-    filetype plugin indent on
 
     " Put these in an autocmd group, so that we can delete them easily.
     augroup vimrcEx
@@ -58,43 +119,26 @@ if has("autocmd")
 
     "http://www.cs.kent.ac.uk/people/staff/cr3/toolbox/haskell/Vim/vim.html
     au BufEnter *.hs compiler ghc
-else
-    set autoindent      " always set autoindenting on
 endif " has("autocmd")
 
-" works better than the autocommand above
-set autochdir
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
 command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
         \ | wincmd p | diffthis
 
-" work around a typo i make constantly
-:command W w
-
-" huzzah for doxygen
-:let g:load_doxygen_syntax=1
-
-" keep *~ out of .
-set backupdir=./.backup,.,~/tmp
-" if . is not writable, put *.swp elsewhere.
-set directory=.,./.backup,~/tmp/
 
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Keystrokes
 
+" change the mapleader from \ to ,
+let mapleader=","
+
 " nice tab navigation  (these need work...)
 nmap <s-left> :tabprevious<cr>
 nmap <s-right> :tabnext<cr>
-
-" emacs nav keys (a crutch i don't seem to need anymore)
-"imap <C-a> <Esc>0i
-"imap <C-e> <Esc>$a
-"map <C-a> <c-n>0
-"map <C-e> <c-n>$
 
 " f4 and shift-f4 to go forward and backards in errors/greps
 nmap <f4> :cn<cr>
@@ -104,13 +148,33 @@ nmap <s-f4> :cp<cr>
 " <c-\> is my analogue for using :ptag
 nmap <c-\> :exe "silent! ptag " . expand("<cword>")<cr>
 
-" i find this clipboard access more convenient
-nmap \y "+y
-nmap \p "+p
+" Quick yanking to the end of the line
+nmap Y y$
+
+" Yank/paste to the OS clipboard with ,y and ,p
+nmap <leader>y "+y
+nmap <leader>Y "+yy
+nmap <leader>p "+p
+nmap <leader>P "+P
+
+" select recent pasted text (for indenting etc.)
+nnoremap <leader>v V`]
+
+" run Ack fast
+nnoremap <leader>a :Ack<Space>
 
 " quick change buffers
 map <C-j> :bprev<CR>
 map <C-k> :bnext<CR>
+
+" Easy window navigation
+map <A-h> <C-w>h
+map <A-j> <C-w>j
+map <A-k> <C-w>k
+map <A-l> <C-w>l
+
+" make a new vertical split and go there
+nnoremap <leader>w <C-w>v<C-w>l
 
 " cycle thru preview tags
 " inspired by http://www.ashberg.de/vim/vimrc.html
@@ -132,23 +196,11 @@ nmap <F2>  :TrinityToggleTagList<cr>
 nmap <F3>  :TrinityToggleSourceExplorer<cr>
 
 
-" mouse is more annoying than helpful for the terminal
-set mouse=
-
 " dons' haskell typeOf script
 map ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" external scripts
-" lovely script to make indentation levels act as text objects
-if filereadable(expand('$HOME/scripts/vim/innerindent.vim'))
-    source $HOME/scripts/vim/innerindent.vim
-endif
-
-" quickly alternate between .c and .h
-if filereadable(expand('$HOME/scripts/vim/a.vim'))
-    source $HOME/scripts/vim/a.vim
-endif
+" work around a typo i make constantly (:W for :w)
+command W w
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -165,21 +217,6 @@ colorscheme koehler
 "set guifont=Monospace\ Bold\ 11
 set guifont=DejaVu\ Sans\ Mono\ 13
 
-" switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-    syntax on
-    set hlsearch
-endif
-
-" show a listing of wildcard completions
-set wildmenu
-" make completion more bash-like
-set wildmode=longest,full
-
-" highlight the current line
-" hmm, only seems to look good in the gui.
-set cursorline
 
 " highlight the word under cursor
 "highlight flicker cterm=bold ctermfg=white
@@ -189,26 +226,9 @@ set cursorline
 " inspired by http://drupal.org/node/29325#comment-213746
 "highlight OverLength ctermbg=red ctermfg=white guibg=red guifg=white
 "match OverLength '\%81v.*'
-" (turned out to be more annoying than helpful)
 
-" interface with gui clipboard if possible
-set clipboard=unnamed
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" formatting defaults
-
-" python, haskell, and vim's softtabstop all conspired to change me to a
-" spaces guy.
-set autoindent
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-set expandtab
-set smarttab
-set foldmethod=syntax
-set foldlevel=99
-set matchpairs+=<:>
-
+" \l to toggle highlighting long lines
 nnoremap <silent> <Leader>l
 \ :if exists('w:long_line_match') <Bar>
 \   silent! call matchdelete(w:long_line_match) <Bar>
@@ -219,9 +239,3 @@ nnoremap <silent> <Leader>l
 \   let w:long_line_match = matchadd('ErrorMsg', '\%>80v.\+', -1) <Bar>
 \ endif<CR>
 
-
-" unmap \be
-" unmap \bs
-" unmap \bv
-" 
-" nmap \b :HSBufExplorer<cr>
