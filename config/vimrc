@@ -97,10 +97,6 @@ let &guioptions = substitute(&guioptions, "T", "", "g")
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Auto Commands
 if has("autocmd")
-    " Enable file type detection.
-    " Use the default filetype settings, so that mail gets 'tw' set to 72,
-    " 'cindent' is on in C files, etc.
-
     " Put these in an autocmd group, so that we can delete them easily.
     augroup vimrcEx
         au!
@@ -115,7 +111,18 @@ if has("autocmd")
                     \ if line("'\"") > 0 && line("'\"") <= line("$") |
                     \   exe "normal! g`\"" |
                     \ endif
-    augroup END
+    augroup end
+
+    augroup invisible_chars "{{{
+        au!
+
+        " Show invisible characters in all of these files
+        autocmd filetype vim setlocal list
+        autocmd filetype perl setlocal list
+        autocmd filetype python,rst setlocal list
+        autocmd filetype ruby setlocal list
+        autocmd filetype javascript,css setlocal list
+    augroup end "}}}
 
     "http://www.cs.kent.ac.uk/people/staff/cr3/toolbox/haskell/Vim/vim.html
     au BufEnter *.hs compiler ghc
@@ -229,7 +236,7 @@ set guifont=DejaVu\ Sans\ Mono\ 13
 
 
 " \l to toggle highlighting long lines
-nnoremap <silent> <Leader>l
+nnoremap <silent> <Leader>o
 \ :if exists('w:long_line_match') <Bar>
 \   silent! call matchdelete(w:long_line_match) <Bar>
 \   unlet w:long_line_match <Bar>
