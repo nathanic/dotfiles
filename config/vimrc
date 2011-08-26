@@ -31,7 +31,7 @@ set backspace=indent,eol,start  " backspace everything in insert mode
 set title               " change terminal title
 set scrolloff=4         " keep 4 lines off the edges of the screen when scrolling
 
-set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)
+set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)\ %{fugitive#statusline()}
 set laststatus=2        " always show status line
 
 "TODO: investigate these
