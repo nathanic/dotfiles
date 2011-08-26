@@ -37,7 +37,7 @@ esac
 [ -d ~/scripts/shell ] && export PATH=~/scripts/shell:$PATH
 # maybe a function pathadd() to encapsulate the above pattern?
 # pathcons, pathsnoc
-export PATH=~/bin:$PATH
+export PATH=~/bin:$PATH:/var/lib/gems/1.8/bin/
 export PYTHONPATH=~/lib/python
 
 # set up the p4 environment if possible
