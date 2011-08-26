@@ -140,8 +140,8 @@ command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Keystrokes
 
-" change the mapleader from \ to ,
-let mapleader=","
+" it's the default, but let's be clear
+let mapleader="\\"
 
 " nice tab navigation  (these need work...)
 nmap <s-left> :tabprevious<cr>
