@@ -79,7 +79,6 @@ export PHONE_ALLY_NATHAN=8C:54:1D:04:E0:8F
 # sources /etc/bash.bashrc).
 [ -f /etc/bash_completion ] && . /etc/bash_completion
 
-
 # don't put duplicate lines in the history. 
 # ... and ignore same sucessive entries.
 export HISTCONTROL=ignoreboth
@@ -304,7 +303,7 @@ function settitle() { echo -ne "\e]2;$@\a\e]1;$@\a"; }
 
 # keychain ssh key management (non-interactive)
 # TODO: just detect the files?  maybe keychain can auto-add.
-if [ -x `which keychain` ]; then  
+if [ -x "`which keychain`" ]; then  
     # i really need to clean up my key filenames...
     keychain --quiet --ignore-missing \
         ~/.ssh/id_rsa                 \
