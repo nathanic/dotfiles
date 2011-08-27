@@ -6,4 +6,12 @@
 	status = auto
 	branch = auto
 [alias]
+    # lot of good ideas http://git.wiki.kernel.org/index.php/Aliases
+    # briefer status output
     st = status -sb
+    # run 'git rm' on files already deleted outside of git
+    rmdead = !git ls-files --deleted | xargs git rm 
+    # list new commits after a fetch
+    lc = log ORIG_HEAD.. --stat --no-merges
+    # sometimes i don't want vimdiff
+    rdiff = diff --no-ext-diff
