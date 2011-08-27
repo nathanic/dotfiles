@@ -2,9 +2,9 @@
 " Vim Compiler File
 " Compiler:	GHC
 " Maintainer:	Claus Reinke <claus.reinke@talk21.com>
-" Last Change:	06/07/2008
+" Last Change:	22/01/2011
 "
-" part of haskell plugins: http://www.cs.kent.ac.uk/~cr3/toolbox/haskell/Vim/
+" part of haskell plugins: http://projects.haskell.org/haskellmode-vim
 
 " ------------------------------ paths & quickfix settings first
 "
@@ -16,19 +16,14 @@ let current_compiler = "ghc"
 
 let s:scriptname = "ghc.vim"
 
-if (!exists("g:ghc") || !executable(g:ghc)) 
-  if !executable('ghc') 
-    echoerr s:scriptname.": can't find ghc. please set g:ghc, or extend $PATH"
-    finish
-  else
-    let g:ghc = 'ghc'
-  endif
-endif    
-let ghc_version = substitute(system(g:ghc . ' --numeric-version'),'\n','','')
-let b:ghc_staticoptions = ''
+if !haskellmode#GHC() | finish | endif
+if (!exists("b:ghc_staticoptions"))
+  let b:ghc_staticoptions = ''
+endif
 
 " set makeprg (for quickfix mode) 
-execute 'setlocal makeprg=' . g:ghc .'\ -e\ :q\ %'
+execute 'setlocal makeprg=' . g:ghc . '\ ' . escape(b:ghc_staticoptions,' ') .'\ -e\ :q\ %'
+"execute 'setlocal makeprg=' . g:ghc .'\ -e\ :q\ %'
 "execute 'setlocal makeprg=' . g:ghc .'\ --make\ %'
 
 " quickfix mode: 
@@ -83,7 +78,7 @@ endfunction
 map <LocalLeader>T :call GHC_ShowType(1)<cr>
 map <LocalLeader>t :call GHC_ShowType(0)<cr>
 function! GHC_ShowType(addTypeDecl)
-  let namsym   = Haskell_GetNameSymbol(getline('.'),col('.'),0)
+  let namsym   = haskellmode#GetNameSymbol(getline('.'),col('.'),0)
   if namsym==[]
     redraw
     echo 'no name/symbol under cursor!'
@@ -92,10 +87,17 @@ function! GHC_ShowType(addTypeDecl)
   let [_,symb,qual,unqual] = namsym
   let name  = qual=='' ? unqual : qual.'.'.unqual
   let pname = ( symb ? '('.name.')' : name ) 
-  call GHC_HaveTypes()
+  let ok    = GHC_HaveTypes()
   if !has_key(b:ghc_types,name)
-    redraw
-    echo pname "type not known"
+    redraw " this happens to hide messages from GHC_HaveTypes
+    if &modified 
+      let comment = " (buffer has unsaved changes)"
+    elseif !ok
+      let comment = " (try :make to see any GHCi errors)"
+    else 
+      let comment = ""
+    endif
+    echo pname "type not known".comment
   else
     redraw
     for type in split(b:ghc_types[name],' -- ')
@@ -108,6 +110,10 @@ function! GHC_ShowType(addTypeDecl)
 endfunction
 
 " show type of identifier under mouse pointer in balloon
+" TODO: it isn't a good idea to tie potentially time-consuming tasks
+"       (querying GHCi for the types) to cursor movements (#14). Currently,
+"       we ask the user to call :GHCReload explicitly. Should there be an
+"       option to reenable the old implicit querying?
 if has("balloon_eval")
   set ballooneval
   set balloondelay=600
@@ -115,18 +121,29 @@ if has("balloon_eval")
   function! GHC_TypeBalloon()
     if exists("b:current_compiler") && b:current_compiler=="ghc" 
       let [line] = getbufline(v:beval_bufnr,v:beval_lnum)
-      let namsym = Haskell_GetNameSymbol(line,v:beval_col,0)
+      let namsym = haskellmode#GetNameSymbol(line,v:beval_col,0)
       if namsym==[]
         return ''
       endif
       let [start,symb,qual,unqual] = namsym
       let name  = qual=='' ? unqual : qual.'.'.unqual
       let pname = name " ( symb ? '('.name.')' : name )
-      silent call GHC_HaveTypes()
-      if has("balloon_multiline")
-        return (has_key(b:ghc_types,pname) ? split(b:ghc_types[pname],' -- ') : '') 
+      if b:ghc_types == {} 
+        redraw
+        echo "no type information (try :GHGReload)"
+      elseif (b:my_changedtick != b:changedtick)
+        redraw
+        echo "type information may be out of date (try :GHGReload)"
+      endif
+      " silent call GHC_HaveTypes()
+      if b:ghc_types!={}
+        if has("balloon_multiline")
+          return (has_key(b:ghc_types,pname) ? split(b:ghc_types[pname],' -- ') : '') 
+        else
+          return (has_key(b:ghc_types,pname) ? b:ghc_types[pname] : '') 
+        endif
       else
-        return (has_key(b:ghc_types,pname) ? b:ghc_types[pname] : '') 
+        return ''
       endif
     else
       return ''
@@ -136,7 +153,7 @@ endif
 
 map <LocalLeader>si :call GHC_ShowInfo()<cr>
 function! GHC_ShowInfo()
-  let namsym   = Haskell_GetNameSymbol(getline('.'),col('.'),0)
+  let namsym   = haskellmode#GetNameSymbol(getline('.'),col('.'),0)
   if namsym==[]
     redraw
     echo 'no name/symbol under cursor!'
@@ -145,8 +162,14 @@ function! GHC_ShowInfo()
   let [_,symb,qual,unqual] = namsym
   let name = qual=='' ? unqual : (qual.'.'.unqual)
   let output = GHC_Info(name)
-  redraw
-  echo output
+  pclose | new 
+  setlocal previewwindow
+  setlocal buftype=nofile
+  setlocal noswapfile
+  put =output
+  wincmd w
+  "redraw
+  "echo output
 endfunction
 
 " fill the type map, unless nothing has changed since the last attempt
@@ -154,11 +177,13 @@ function! GHC_HaveTypes()
   if b:ghc_types == {} && (b:my_changedtick != b:changedtick)
     let b:my_changedtick = b:changedtick
     return GHC_BrowseAll()
+  else
+    return 1
   endif
 endfunction
 
 " update b:ghc_types after successful make
-au QuickFixCmdPost make if GHC_CountErrors()==0 | silent call GHC_BrowseAll() | endif
+au QuickFixCmdPost make if exists("current_compiler") && current_compiler=="ghc" && (GHC_CountErrors()==0) | silent call GHC_BrowseAll() | endif
 
 " count only error entries in quickfix list, ignoring warnings
 function! GHC_CountErrors()
@@ -169,29 +194,17 @@ endfunction
 
 command! GHCReload call GHC_BrowseAll()
 function! GHC_BrowseAll()
-  " let imports = Haskell_GatherImports()
+  " let imports = haskellmode#GatherImports()
   " let modules = keys(imports[0]) + keys(imports[1])
+  let b:my_changedtick = b:changedtick
   let imports = {} " no need for them at the moment
   let current = GHC_NameCurrent()
   let module = current==[] ? 'Main' : current[0]
-  if GHC_VersionGE([6,8,1])
+  if haskellmode#GHC_VersionGE([6,8,1])
     return GHC_BrowseBangStar(module)
   else
     return GHC_BrowseMultiple(imports,['*'.module])
   endif
-endfunction
-
-function! GHC_VersionGE(target)
-  let current = split(g:ghc_version, '\.' )
-  let target  = a:target
-  for i in current
-    if ((target==[]) || (i>=target[0]))
-      let target = target[1:]
-    else
-      return 0
-    endif
-  endfor
-  return 1
 endfunction
 
 function! GHC_NameCurrent()
@@ -213,6 +226,9 @@ endfunction
 function! GHC_BrowseBangStar(module)
   redraw
   echo "browsing module " a:module
+  " TODO: this doesn't work if a:module is loaded compiled - we
+  "       could try to give a more helpful error message, or use
+  "       -fforce-recomp directly
   let command = ":browse! *" . a:module
   let orig_shellredir = &shellredir
   let &shellredir = ">" " ignore error/warning messages, only output or lack of it
@@ -232,7 +248,7 @@ endfunction
 
 function! GHC_Info(what)
   " call GHC_HaveTypes()
-  let output = system(g:ghc . ' ' . b:ghc_staticoptions . ' -v0 --interactive ' . expand("%"), ":i ". a:what)
+  let output = system(g:ghc . ' ' . b:ghc_staticoptions . ' -v0 --interactive ' . expand("%"), ":info ". a:what)
   return output
 endfunction
 
@@ -246,6 +262,7 @@ function! GHC_ProcessBang(module,output)
   let definedPat  = '^-- defined locally'
   let importedPat = '^-- imported via \(.*\)'
   if !(b=~commentPat)
+    redraw
     echo s:scriptname.": GHCi reports errors (try :make?)"
     return 0
   endif
@@ -296,6 +313,7 @@ function! GHC_Process(imports,output)
   let modPat  = '^-- \(\S*\)'
   " add '-- defined locally' and '-- imported via ..'
   if !(b=~modPat)
+    redraw
     echo s:scriptname.": GHCi reports errors (try :make?)"
     return 0
   endif
@@ -344,7 +362,7 @@ let s:ghc_templates = ["module _ () where","class _ where","class _ => _ where",
 " use ghci :browse index for insert mode omnicompletion (CTRL-X CTRL-O)
 function! GHC_CompleteImports(findstart, base)
   if a:findstart 
-    let namsym   = Haskell_GetNameSymbol(getline('.'),col('.'),-1) " insert-mode: we're 1 beyond the text
+    let namsym   = haskellmode#GetNameSymbol(getline('.'),col('.'),-1) " insert-mode: we're 1 beyond the text
     if namsym==[]
       redraw
       echo 'no name/symbol under cursor!'
@@ -365,7 +383,16 @@ function! GHC_CompleteImports(findstart, base)
   endif
 endfunction
 set omnifunc=GHC_CompleteImports
-set completeopt=menu,menuone,longest
+"
+" Vim's default completeopt is menu,preview
+" you probably want at least menu, or you won't see alternatives listed
+" setlocal completeopt+=menu
+
+" menuone is useful, but other haskellmode menus will try to follow your choice here in future
+" setlocal completeopt+=menuone
+
+" longest sounds useful, but doesn't seem to do what it says, and interferes with CTRL-E
+" setlocal completeopt-=longest
 
 map <LocalLeader>ct :call GHC_CreateTagfile()<cr>
 function! GHC_CreateTagfile()
@@ -377,7 +404,7 @@ function! GHC_CreateTagfile()
   echo output
 endfunction
 
-command! -nargs=1 GHCi redraw | echo system(g:ghc. ' ' . b:ghc_staticoptions .' '.expand("%").' -e <f-args>')
+command! -nargs=1 GHCi redraw | echo system(g:ghc. ' ' . b:ghc_staticoptions .' '.expand("%").' -e "'.escape(<f-args>,'"').'"')
 
 " use :make 'not in scope' errors to explicitly list imported ids
 " cursor needs to be on import line, in correctly loadable module
@@ -391,37 +418,108 @@ function! GHC_MkImportsExplicit()
     let [_,q,mod;x] = ml
     silent make
     if getqflist()==[]
-      call setline(lineno,'-- '.line)
+      if line=~"import[^(]*Prelude"
+        call setline(lineno,substitute(line,"(.*","","").'()')
+      else
+        call setline(lineno,'-- '.line)
+      endif
       silent write
       silent make
       let qflist = getqflist()
       call setline(lineno,line)
       silent write
-      let ids = []
+      let ids = {}
       for d in qflist
-        let ml = matchlist(d.text,'Not in scope: `\([^'']*\)''')
+        let ml = matchlist(d.text,'Not in scope: \([^`]*\)`\([^'']*\)''')
         if ml!=[]
-          let [_,qid;x] = ml
+          let [_,what,qid;x] = ml
           let id  = ( qid =~ "^[A-Z]" ? substitute(qid,'.*\.\([^.]*\)$','\1','') : qid )
           let pid = ( id =~ "[a-zA-Z0-9_']\\+" ? id : '('.id.')' )
-          let ids += [pid]
+          if what =~ "data"
+            call GHC_HaveTypes()
+            if has_key(b:ghc_types,id)
+              let pid = substitute(b:ghc_types[id],'^.*->\s*\(\S*\).*$','\1','').'('.pid.')'
+            else
+              let pid = '???('.pid.')'
+            endif
+          endif
+          let ids[pid] = 1
         endif
       endfor
-      call setline(lineno,'import'.q.' '.mod.'('.join(ids,',').')')
+      call setline(lineno,'import'.q.' '.mod.'('.join(keys(ids),',').')')
+    else
+      copen
     endif
   endif
   call setpos('.', save_cursor)
 endfunction
 
-if GHC_VersionGE([6,8,2])
-  let opts = filter(split(substitute(system(g:ghc . ' -v0 --interactive', ':set'), '  ', '','g'), '\n'), 'v:val =~ "-f"')
+" no need to ask GHC about its supported languages and
+" options with every editing session. cache the info in
+" ~/.vim/haskellmode.config 
+" TODO: should we store more info (see haskell_doc.vim)?
+"       move to autoload?
+"       should we keep a history of GHC versions encountered?
+function! GHC_SaveConfig()
+  let vimdir = expand('~').'/'.'.vim'
+  let config = vimdir.'/haskellmode.config'
+  if !isdirectory(vimdir)
+    call mkdir(vimdir)
+  endif
+  let entries = ['-- '.g:ghc_version]
+  for l in s:ghc_supported_languages
+    let entries += [l]
+  endfor
+  let entries += ['--']
+  for l in s:opts
+    let entries += [l]
+  endfor
+  call writefile(entries,config)
+endfunction
+
+" reuse cached GHC configuration info, if using the same
+" GHC version.
+function! GHC_LoadConfig()
+  let vimdir = expand('~').'/'.'.vim'
+  let config = vimdir.'/haskellmode.config'
+  if filereadable(config)
+    let lines = readfile(config)
+    if lines[0]=='-- '.g:ghc_version
+      let i=1
+      let s:ghc_supported_languages = []
+      while i<len(lines) && lines[i]!='--'
+        let s:ghc_supported_languages += [lines[i]]
+        let i+=1
+      endwhile
+      let i+=1
+      let s:opts = []
+      while i<len(lines)
+        let s:opts += [lines[i]]
+        let i+=1
+      endwhile
+      return 1
+    else
+      return 0
+    endif
+  else
+    return 0
+  endif
+endfunction
+
+let s:GHC_CachedConfig = haskellmode#GHC_VersionGE([6,8]) && GHC_LoadConfig()
+
+if haskellmode#GHC_VersionGE([6,8,2])
+  if !s:GHC_CachedConfig
+    let s:opts = filter(split(substitute(system(g:ghc . ' -v0 --interactive', ':set'), '  ', '','g'), '\n'), 'v:val =~ "-f"')
+  endif
 else
-  let opts = ["-fglasgow-exts","-fallow-undecidable-instances","-fallow-overlapping-instances","-fno-monomorphism-restriction","-fno-mono-pat-binds","-fno-cse","-fbang-patterns","-funbox-strict-fields"]
+  let s:opts = ["-fglasgow-exts","-fallow-undecidable-instances","-fallow-overlapping-instances","-fno-monomorphism-restriction","-fno-mono-pat-binds","-fno-cse","-fbang-patterns","-funbox-strict-fields"]
 endif
+let s:opts = sort(s:opts)
 
 amenu ]OPTIONS_GHC.- :echo '-'<cr>
 aunmenu ]OPTIONS_GHC
-for o in opts
+for o in s:opts
   exe 'amenu ]OPTIONS_GHC.'.o.' :call append(0,"{-# OPTIONS_GHC '.o.' #-}")<cr>'
 endfor
 if has("gui_running")
@@ -432,9 +530,11 @@ endif
 
 amenu ]LANGUAGES_GHC.- :echo '-'<cr>
 aunmenu ]LANGUAGES_GHC
-if GHC_VersionGE([6,8])
-  let ghc_supported_languages = split(system(g:ghc . ' --supported-languages'),'\n')
-  for l in ghc_supported_languages
+if haskellmode#GHC_VersionGE([6,8])
+  if !s:GHC_CachedConfig
+    let s:ghc_supported_languages = sort(split(system(g:ghc . ' --supported-languages'),'\n'))
+  endif
+  for l in s:ghc_supported_languages
     exe 'amenu ]LANGUAGES_GHC.'.l.' :call append(0,"{-# LANGUAGE '.l.' #-}")<cr>'
   endfor
   if has("gui_running")
@@ -443,3 +543,8 @@ if GHC_VersionGE([6,8])
     map <LocalLeader>lang :emenu ]LANGUAGES_GHC.
   endif
 endif
+
+if !s:GHC_CachedConfig
+  call GHC_SaveConfig()
+endif
+
