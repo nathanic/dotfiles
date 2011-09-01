@@ -198,7 +198,7 @@ GIT_PS1_SHOWUNTRACKEDFILES=1 #... untracked files(%)
 # non-color fallback for unknown terminals
 # TODO: find more reliable method of detecting color capability.
 case "$TERM" in
-    xterm-color|xterm|cygwin|linux|screen) ;;
+    xterm-color|xterm-256color|xterm|cygwin|linux|screen) ;;
     *) PS1='${prefix}\u@\h:\w\$ ' ;;
 esac
 
