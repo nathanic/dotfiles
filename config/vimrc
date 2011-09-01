@@ -130,6 +130,10 @@ if has("autocmd")
     " support multi-ad template files
     au BufNewFile,BufReadPost *.thtml setl filetype=html
 
+
+    " i don't know why the bundled ftdetect isn't covering this...
+    autocmd BufNewFile,BufRead *.coffee set filetype=coffee
+
 endif " has("autocmd")
 
 
