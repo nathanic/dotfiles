@@ -126,6 +126,10 @@ if has("autocmd")
 
     "http://www.cs.kent.ac.uk/people/staff/cr3/toolbox/haskell/Vim/vim.html
     au BufEnter *.hs compiler ghc
+
+    " support multi-ad template files
+    au BufNewFile,BufReadPost *.thtml setl filetype=html
+
 endif " has("autocmd")
 
 
