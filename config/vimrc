@@ -207,7 +207,8 @@ nmap <space> :put =''<cr>
 
 " IDE-ish plugins
 nmap <F1>  :TrinityToggleNERDTree<cr>
-nmap <F2>  :TrinityToggleTagList<cr>
+"nmap <F2>  :TrinityToggleTagList<cr>
+nmap <F2>  :TagbarToggle<cr>
 nmap <F3>  :TrinityToggleSourceExplorer<cr>
 
 
