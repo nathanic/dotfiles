@@ -1,22 +1,20 @@
 #!/usr/bin/env python
+# dead simple http server for ./*
+
 import sys
-import BaseHTTPServer
+from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+from SocketServer import ThreadingMixIn
 
-
-HandlerClass = SimpleHTTPRequestHandler
-ServerClass  = BaseHTTPServer.HTTPServer
-Protocol     = "HTTP/1.0"
+class ThreadingServer(ThreadingMixIn, HTTPServer):
+    pass
 
 if sys.argv[1:]:
     port = int(sys.argv[1])
 else:
     port = 8000
-server_address = ('', port)
 
-HandlerClass.protocol_version = Protocol
-httpd = ServerClass(server_address, HandlerClass)
-
-sa = httpd.socket.getsockname()
-print "Serving HTTP on", sa[0], "port", sa[1], "..."
-httpd.serve_forever()
+srvr = ThreadingServer(('0.0.0.0', port), SimpleHTTPRequestHandler)
+sa = srvr.socket.getsockname()
+print "Serving HTTP on %s:%d" % sa
+srvr.serve_forever()
