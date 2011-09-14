@@ -13,8 +13,9 @@
     rmdead = !git ls-files --deleted | xargs git rm 
     # list new commits after a fetch
     lc = log ORIG_HEAD.. --stat --no-merges
-    # sometimes i don't want vimdiff
+    # useful at times that i have a more exotic default diff (vimdiff)
     rdiff = diff --no-ext-diff
+    # highlight differing words instead of lines
+    wdiff = diff --color-words
     # nicer log output
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
-
