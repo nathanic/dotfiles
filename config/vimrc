@@ -34,10 +34,11 @@ set scrolloff=4         " keep 4 lines off the edges of the screen when scrollin
 set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)\ %{fugitive#statusline()}
 set laststatus=2        " always show status line
 
-"TODO: investigate these
-set backupdir=./.backup,.,~/tmp   " keep *~ out of .
-" if . is not writable, put *.swp elsewhere.
-set directory=.,./.backup,~/tmp/
+" put swap files in my personal tmp dir
+" the double slash means that vim should use full paths,
+" subbing % for /.  ~/tmp/%home%nathan%example
+set directory=~/tmp//
+set backupdir=~/tmp//   " keep *~ out of .
 
 set mouse=              " disable mouse usage in terminal
 

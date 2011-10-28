@@ -33,6 +33,9 @@ case $HOSTNAME in
         ;;
 esac
 
+# ensure tmp exists
+[ -d ~/tmp/ ] || mkdir ~/tmp
+
 [ -d ~/.cabal/ ] && export PATH=~/.cabal/bin:$PATH
 [ -d ~/scripts/shell ] && export PATH=~/scripts/shell:$PATH
 # maybe a function pathadd() to encapsulate the above pattern?
