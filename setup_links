@@ -20,6 +20,7 @@ def linkAllInDir(srcdir, destdir, dryrun=False, fileprefix=''):
         os.mkdir(destdir)
     for f in os.listdir(srcdir):
         src  = op.join(srcdir,f)
+        # XXX we can ditch relpath now that we're not doing ~/bin/
         srcrel = op.relpath(src, destdir)
         dest = op.join(destdir, fileprefix + f)
 
@@ -51,7 +52,9 @@ if __name__ == '__main__':
         print 'NOTE: performing a DRY RUN.  no actual changes will be made.'
 
     removeable =  linkAllInDir('config/', op.expanduser('~/'), dryrun, fileprefix='.')
-    removeable += linkAllInDir('bin/', op.expanduser('~/bin/'), dryrun)
+
+    # don't populate bin anymore, just add ~/dotfiles/bin/ to $PATH
+    #removeable += linkAllInDir('bin/', op.expanduser('~/bin/'), dryrun)
 
     if removeable:
         print "\nThe following files already existed but had the same contents as the repo."
