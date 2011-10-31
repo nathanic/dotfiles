@@ -259,6 +259,9 @@ alias cack='ack --cc --cpp'
 alias ackl='ack --pager="less -R"'
 alias cackl='ack --cc --cpp --pager="less -R"'
 
+# be 'nice' about both io scheduling and CPU scheduling
+alias verynice='ionice -c3 nice'
+
 # remote copy (interactive); uses args like scp
 # can resume partial transfers, but requires remote rsync
 # note that -a means preserve attribs and do not follow symlinks
