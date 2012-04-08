@@ -15,6 +15,11 @@ case $HOSTNAME in
     hugin) 
         export PATH=~/p/rb/arm-elf/bin:$PATH 
         ;;
+    hapax)
+        export JAVA_HOME=~/local/jdk-6
+        export ANDROID_HOME=~/local/android-sdk-linux
+        export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:$PATH
+        ;;
     wintermute) 
         export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
         ;;
@@ -23,12 +28,12 @@ case $HOSTNAME in
         export PATH=~/hs/bin:~/python/bin:$PATH
         ;;
     nathan-xp) 
-        export PATH=$PATH:/c/ghc/ghc-6.8.1/bin/
+        export PATH=$PATH:/c/ghc/ghc-6.8.1/bin
         export PATH=$PATH:"/c/Program Files/Sun/xVM VirtualBox"
         ;;
     octavius) 
-        #export PATH=$PATH:/c/ghc/ghc-6.8.1/bin/
-        export PATH=$PATH:/c/ghc/ghc-6.10.1/bin/
+        #export PATH=$PATH:/c/ghc/ghc-6.8.1/bin
+        export PATH=$PATH:/c/ghc/ghc-6.10.1/bin
         export PATH="/c/Program Files (x86)/Haskell/bin":$PATH:"/c/Program Files/Sun/xVM VirtualBox"
         ;;
 esac
@@ -40,7 +45,7 @@ esac
 [ -d ~/scripts/shell ] && export PATH=~/scripts/shell:$PATH
 # maybe a function pathadd() to encapsulate the above pattern?
 # pathcons, pathsnoc
-export PATH=~/bin/:~/dotfiles/bin/:$PATH:/var/lib/gems/1.8/bin/
+export PATH=~/bin:~/dotfiles/bin:$PATH:/var/lib/gems/1.8/bin
 export PYTHONPATH=~/lib/python
 
 # set up the p4 environment if possible
@@ -128,7 +133,6 @@ RED="\[\e[31m\]"
 GREEN="\[\e[32m\]"
 YELLOW="\[\e[33m\]"
 BLUE="\[\e[34m\]"
-PURPLE="\[\e[35m\]"
 MAGENTA="\[\e[35m\]"
 CYAN="\[\e[36m\]"
 WHITE="\[\e[37m\]"
@@ -153,6 +157,7 @@ case "$HOSTNAME" in
     nathan-xp)      ;;
     octavius)       ;;
     xathan)         hostcolor=$MAGENTA ;;
+    hapax)          hostcolor=${BOLD_ON}${WHITE} ;;
     gir)            ;;
 esac
 
