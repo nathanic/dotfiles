@@ -31,6 +31,9 @@ set backspace=indent,eol,start  " backspace everything in insert mode
 set title               " change terminal title
 set scrolloff=4         " keep 4 lines off the edges of the screen when scrolling
 
+set splitbelow          " new windows below old ones
+set shiftround          " round to nearest multiple of shiftwidth
+
 set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)\ %{fugitive#statusline()}
 set laststatus=2        " always show status line
 
@@ -212,6 +215,9 @@ nmap <F1>  :TrinityToggleNERDTree<cr>
 nmap <F2>  :TagbarToggle<cr>
 nmap <F3>  :TrinityToggleSourceExplorer<cr>
 
+" filter through xml tidy (must be available on path)
+" select xml text in visual mode to use
+vmap ,x :!tidy -q -i --indent-spaces 4 -xml<CR>
 
 " dons' haskell typeOf script
 map ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
@@ -255,4 +261,5 @@ nnoremap <silent> <Leader>o
 \ else <Bar>
 \   let w:long_line_match = matchadd('ErrorMsg', '\%>80v.\+', -1) <Bar>
 \ endif<CR>
+
 
