@@ -10,10 +10,12 @@ export EDITOR=/usr/bin/vim
 [ $HOSTNAME = dev1 ] && export EDITOR=$HOME/bin/vim
 
 # various paths
-export CPATH=~/include:~/local/include/:$CPATH
+export CPATH=~/include:~/local/include:$CPATH
 case $HOSTNAME in
     hugin) 
-        export PATH=~/p/rb/arm-elf/bin:$PATH 
+        export PATH=~/p/rb/arm-elf/bin:$PATH:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools
+        export JAVA_HOME=~/local/glassfish3/jdk
+        export ANDROID_HOME=~/local/android-sdk-linux
         ;;
     wintermute) 
         export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
@@ -40,7 +42,7 @@ esac
 [ -d ~/scripts/shell ] && export PATH=~/scripts/shell:$PATH
 # maybe a function pathadd() to encapsulate the above pattern?
 # pathcons, pathsnoc
-export PATH=~/bin/:~/dotfiles/bin/:$PATH:/var/lib/gems/1.8/bin/
+export PATH=~/bin:~/dotfiles/bin:$PATH:/var/lib/gems/1.8/bin
 export PYTHONPATH=~/lib/python
 
 # set up the p4 environment if possible
@@ -56,7 +58,7 @@ if [ $HOSTNAME = dev1 ]; then
     #    cygwin|xterm|xterm-*) TERM="xterm-color" ;;
     #esac 
     # suggested by bcocks for some creator problem i forgot about.
-    export LD_LIBRARY_PATH=$HOME/lib:$HOME/local/lib:$HOME/hs/lib:/usr/dt/lib:/usr/local/lib:/usr/lib:/usr/sfw/lib/sparcv9:/usr/ccs/lib:/usr/local/ssl/lib:/opt/sfw/lib/sparcv9:$ORACLE_HOME/lib:/opt/sfw/lib:/raid/0/pgsql/lib/:/raid/0/users2/afeick/local-gcc3.2/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$HOME/lib:$HOME/local/lib:$HOME/hs/lib:/usr/dt/lib:/usr/local/lib:/usr/lib:/usr/sfw/lib/sparcv9:/usr/ccs/lib:/usr/local/ssl/lib:/opt/sfw/lib/sparcv9:$ORACLE_HOME/lib:/opt/sfw/lib:/raid/0/pgsql/lib:/raid/0/users2/afeick/local-gcc3.2/lib:$LD_LIBRARY_PATH
     export P4CLIENT=nstien-dev1
     # i have to export this so make(1) will see it and build right
     export OSTYPE
@@ -235,6 +237,9 @@ alias d0='export DISPLAY=:0'
 
 # 'less' passes ANSI colors
 alias less='less -R'
+
+# change to the top level directory of the nearest enclosing git repo
+alias cdgit='cd $(git rev-parse --show-toplevel)'
 
 alias updatebashrc='exec bash --login'
 alias clipget='xclip -selection clipboard -out'
