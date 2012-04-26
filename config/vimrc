@@ -99,6 +99,9 @@ let &guioptions = substitute(&guioptions, "t", "", "g")
 " also just ditch the toolbar, since it adds nothing to a keyboard-driven app
 let &guioptions = substitute(&guioptions, "T", "", "g")
 
+" Settings for VimClojure
+let g:vimclojure#HighlightBuiltins=1
+let g:vimclojure#ParenRainbow=1
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -137,6 +140,9 @@ if has("autocmd")
 
     " i don't know why the bundled ftdetect isn't covering this...
     autocmd BufNewFile,BufRead *.coffee set filetype=coffee
+
+    " do i have to do everything myself?
+    au BufNewFile,BufRead *.clj set filetype=clojure
 
 endif " has("autocmd")
 
