@@ -244,7 +244,7 @@ alias d0='export DISPLAY=:0'
 alias less='less -R'
 
 # change to the top level directory of the nearest enclosing git repo
-alias cdgit='cd $(git rev-parse --show-toplevel)'
+alias cdgr='cd $(git rev-parse --show-toplevel)'
 
 alias updatebashrc='exec bash --login'
 alias clipget='xclip -selection clipboard -out'
