@@ -141,6 +141,8 @@ if exists("b:vimclojure_namespace")
 	augroup END
 endif
 
-call vimclojure#MapPlug("n", "p", "CloseResultBuffer")
+" NPS 2012-04-26
+" removing to avoid conflict with my own binding
+" call vimclojure#MapPlug('n', 'p', 'CloseResultBuffer')
 
 let &cpo = s:cpo_save

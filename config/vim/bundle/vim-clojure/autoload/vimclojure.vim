@@ -362,7 +362,10 @@ function! vimclojure#ResultBuffer.Init() dict
 	setlocal buftype=nofile
 	setlocal bufhidden=wipe
 
-	call vimclojure#MapPlug("n", "p", "CloseResultBuffer")
+    " NPS 2012-04-26 disabling this because it conflicts with my own binding
+    " NB due to vimscript being a terrible language, i changed the double quotes
+    " to single quotes in order to comment it out.
+    " call vimclojure#MapPlug('n', 'p', 'CloseResultBuffer')
 
 	call self.clear()
 	let leader = exists("g:maplocalleader") ? g:maplocalleader : "\\"
