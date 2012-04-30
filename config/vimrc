@@ -77,7 +77,7 @@ endif
 
 if has("gui_running")
     " only looks good in the GUI
-    set cursorline          " highlight the current line
+    "set cursorline          " highlight the current line
 endif
 
 
