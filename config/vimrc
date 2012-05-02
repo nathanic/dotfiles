@@ -243,8 +243,8 @@ command W w
 colorscheme koehler
 
 " this looks good on my x11 on hugin at least.
-"set guifont=Monospace\ Bold\ 11
-set guifont=DejaVu\ Sans\ Mono\ 13
+set guifont=Monospace\ 11
+"set guifont=DejaVu\ Sans\ Mono\ 13
 
 
 " highlight the word under cursor
