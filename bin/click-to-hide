@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# workaround for chromium's zombie menu bug
+# this uses xwininfo to find a window id
+# and then unmaps it with xdotool
+WININFO=$(xwininfo | grep 'xwininfo: Window id:')
+WINID=$(echo $WININFO | cut -d' ' -s -f 4)
+
+echo "Hiding window $WININFO"
+xdotool windowunmap $WINID
