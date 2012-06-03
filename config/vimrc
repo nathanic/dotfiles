@@ -51,8 +51,6 @@ set wildignore=*.swp,*.bak,*.pyc,*.class,*.o
 
 set clipboard=unnamed   " use gui clipboard if possible
 
-
-
 set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·
 set nolist                      " don't show invisible characters by default,
                                 " but it is enabled for some file types (see later)
@@ -134,16 +132,14 @@ if has("autocmd")
     "http://www.cs.kent.ac.uk/people/staff/cr3/toolbox/haskell/Vim/vim.html
     au BufEnter *.hs compiler ghc
 
-    " support multi-ad template files
+    " support MASI::Template files as html
     au BufNewFile,BufReadPost *.thtml setl filetype=html
-
 
     " i don't know why the bundled ftdetect isn't covering this...
     autocmd BufNewFile,BufRead *.coffee set filetype=coffee
 
     " do i have to do everything myself?
     au BufNewFile,BufRead *.clj set filetype=clojure
-
 endif " has("autocmd")
 
 
@@ -162,25 +158,25 @@ command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
 let mapleader="\\"
 
 " nice tab navigation  (these need work...)
-nmap <s-left> :tabprevious<cr>
-nmap <s-right> :tabnext<cr>
+nnoremap <s-left> :tabprevious<cr>
+nnoremap <s-right> :tabnext<cr>
 
 " f4 and shift-f4 to go forward and backards in errors/greps
-nmap <f4> :cn<cr>
-nmap <s-f4> :cp<cr>
+nnoremap <f4> :cn<cr>
+nnoremap <s-f4> :cp<cr>
 
 " <c-]> jumps to the tag under the cursor;
 " <c-\> is my analogue for using :ptag
-nmap <c-\> :exe "silent! ptag " . expand("<cword>")<cr>
+nnoremap <c-\> :exe "silent! ptag " . expand("<cword>")<cr>
 
 " Quick yanking to the end of the line
-nmap Y y$
+nnoremap Y y$
 
 " Yank/paste to the OS clipboard with ,y and ,p
-nmap <leader>y "+y
-nmap <leader>Y "+yy
-nmap <leader>p "+p
-nmap <leader>P "+P
+nnoremap <leader>y "+y
+nnoremap <leader>Y "+yy
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
 
 " select recent pasted text (for indenting etc.)
 nnoremap <leader>v V`]
@@ -189,44 +185,44 @@ nnoremap <leader>v V`]
 nnoremap <leader>a :Ack<Space>
 
 " quick change buffers
-map <C-j> :bprev<CR>
-map <C-k> :bnext<CR>
+noremap <C-j> :bprev<CR>
+noremap <C-k> :bnext<CR>
 
 " Easy window navigation
-map <A-h> <C-w>h
-map <A-j> <C-w>j
-map <A-k> <C-w>k
-map <A-l> <C-w>l
+noremap <A-h> <C-w>h
+noremap <A-j> <C-w>j
+noremap <A-k> <C-w>k
+noremap <A-l> <C-w>l
 
 " make a new vertical split and go there
 nnoremap <leader>w <C-w>v<C-w>l
 
 " cycle thru preview tags
 " inspired by http://www.ashberg.de/vim/vimrc.html
-map <C-PageUp> :ptp<cr>
-map <C-PageDown> :ptn<cr>
-imap <C-PageUp> <esc>:silent! ptp<cr>a
-imap <C-PageDown> <esc>:silent! ptn<cr>a
+noremap <C-PageUp> :ptp<cr>
+noremap <C-PageDown> :ptn<cr>
+inoremap <C-PageUp> <esc>:silent! ptp<cr>a
+inoremap <C-PageDown> <esc>:silent! ptn<cr>a
 
 " Don't use Ex mode, use Q for formatting
-map Q gq
+noremap Q gq
 
 " Insert a blank line below the current line in normal mode.
 " Handy because it won't continue code comments.
-nmap <space> :put =''<cr>
+nnoremap <space> :put =''<cr>
 
 " IDE-ish plugins
-nmap <F1>  :TrinityToggleNERDTree<cr>
-"nmap <F2>  :TrinityToggleTagList<cr>
-nmap <F2>  :TagbarToggle<cr>
-nmap <F3>  :TrinityToggleSourceExplorer<cr>
+nnoremap <F1>  :TrinityToggleNERDTree<cr>
+"nnoremap <F2>  :TrinityToggleTagList<cr>
+nnoremap <F2>  :TagbarToggle<cr>
+nnoremap <F3>  :TrinityToggleSourceExplorer<cr>
 
 " filter through xml tidy (must be available on path)
 " select xml text in visual mode to use
-vmap ,x :!tidy -q -i --indent-spaces 4 -xml<CR>
+vnoremap ,x :!tidy -q -i --indent-spaces 4 -xml<CR>
 
 " dons' haskell typeOf script
-map ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
+nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 
 " work around a typo i make constantly (:W for :w)
 command W w
