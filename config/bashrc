@@ -23,7 +23,9 @@ case $HOSTNAME in
         export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:$PATH
         ;;
     wintermute) 
-        export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
+        export JAVA_HOME=~/local/jdk-6
+        export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:$PATH
+        #export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
         ;;
     dev1)
         export PATH=$HOME/gcc-4.4.4/bin:/opt/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/ucb:/usr/local/bin:$PATH
@@ -151,7 +153,7 @@ curdircolor=$BRIGHTBLUE
 
 case "$HOSTNAME" in 
     hugin)          hostcolor=$BLUE ;;
-    wintermute)     ;;
+    wintermute)     hostcolor=$BOLD_ON$WHITE;;
     dev1)           hostcolor=$BOLD_ON$CYAN ;;
     lildeb)         hostcolor=${BOLD_ON}${YELLOW} ;;
     munin)          hostcolor=$RED ;;
