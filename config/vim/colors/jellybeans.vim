@@ -11,12 +11,12 @@
 "
 " File:         jellybeans.vim
 " Maintainer:   NanoTech <http://nanotech.nanotechcorp.net/>
-" Version:      1.5
+" Version:      1.6~git
 " Last Change:  January 15th, 2012
 " Contributors: Daniel Herbert <http://pocket-ninja.com/>,
 "               Henry So, Jr. <henryso@panix.com>,
 "               David Liang <bmdavll at gmail dot com>,
-"               Rich Healey (richoH),
+"               Rich Healey (richo),
 "               Andrew Wong (w0ng)
 "
 " Copyright (c) 2009-2012 NanoTech
@@ -289,7 +289,11 @@ fun! s:X(group, fg, bg, attr, lcfg, lcbg)
 endfun
 " }}}
 
-call s:X("Normal","e8e8d3","151515","","White","")
+if !exists("g:jellybeans_background_color")
+  let g:jellybeans_background_color = "151515"
+end
+
+call s:X("Normal","e8e8d3",g:jellybeans_background_color,"","White","")
 set background=dark
 
 if !exists("g:jellybeans_use_lowcolor_black") || g:jellybeans_use_lowcolor_black
@@ -315,9 +319,9 @@ endif
 call s:X("Visual","","404040","","",s:termBlack)
 call s:X("Cursor","","b0d0f0","","","")
 
-call s:X("LineNr","605958","151515","none",s:termBlack,"")
+call s:X("LineNr","605958",g:jellybeans_background_color,"none",s:termBlack,"")
 call s:X("Comment","888888","","italic","Grey","")
-call s:X("Todo","808080","","bold","White",s:termBlack)
+call s:X("Todo","c7c7c7","","bold","White",s:termBlack)
 
 call s:X("StatusLine","000000","dddddd","italic","","White")
 call s:X("StatusLineNC","ffffff","403c41","italic","White","Black")
@@ -347,7 +351,7 @@ call s:X("PreProc","8fbfdc","","","LightBlue","")
 hi! link Operator Normal
 
 call s:X("Type","ffb964","","","Yellow","")
-call s:X("NonText","606060","151515","",s:termBlack,"")
+call s:X("NonText","606060",g:jellybeans_background_color,"",s:termBlack,"")
 
 call s:X("SpecialKey","444444","1c1c1c","",s:termBlack,"")
 
@@ -390,6 +394,10 @@ hi! link phpBoolean Constant
 hi! link phpNull Constant
 hi! link phpArrayPair Operator
 
+" Python
+
+hi! link pythonOperator Statement
+
 " Ruby
 
 hi! link rubySharpBang Comment
@@ -429,6 +437,7 @@ hi! link luaOperator Conditional
 
 " C
 
+hi! link cFormat Identifier
 hi! link cOperator Constant
 
 " Objective-C/Cocoa
@@ -454,14 +463,17 @@ call s:X("DbgBreakPt","","4F0037","","","DarkMagenta")
 if !exists("g:indent_guides_auto_colors")
   let g:indent_guides_auto_colors = 0
 endif
-call s:X("IndentGuidesOdd","","202020","","","")
-call s:X("IndentGuidesEven","","1c1c1c","","","")
+call s:X("IndentGuidesOdd","","232323","","","")
+call s:X("IndentGuidesEven","","1b1b1b","","","")
 
 " Plugins, etc.
 
 hi! link TagListFileName Directory
 call s:X("PreciseJumpTarget","B9ED67","405026","","White","Green")
 
+if !exists("g:jellybeans_background_color_256")
+  let g:jellybeans_background_color_256=233
+end
 " Manual overrides for 256-color terminals. Dark colors auto-map badly.
 if !s:low_color
   hi StatusLineNC ctermbg=235
@@ -471,11 +483,13 @@ if !s:low_color
   hi CursorColumn ctermbg=234
   hi CursorLine ctermbg=234
   hi SpecialKey ctermbg=234
-  hi NonText ctermbg=233
-  hi LineNr ctermbg=233
+  exec "hi NonText ctermbg=".g:jellybeans_background_color_256
+  exec "hi LineNr ctermbg=".g:jellybeans_background_color_256
   hi DiffText ctermfg=81
-  hi Normal ctermbg=233
+  exec "hi Normal ctermbg=".g:jellybeans_background_color_256
   hi DbgBreakPt ctermbg=53
+  hi IndentGuidesOdd ctermbg=235
+  hi IndentGuidesEven ctermbg=234
 endif
 
 " delete functions {{{
