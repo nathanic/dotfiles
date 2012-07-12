@@ -4,8 +4,8 @@
 #
 # SWANK client for Slimv
 # swank.py:     SWANK client code for slimv.vim plugin
-# Version:      0.9.7
-# Last Change:  20 Apr 2012
+# Version:      0.9.8
+# Last Change:  18 Jun 2012
 # Maintainer:   Tamas Kovacs <kovisoft at gmail dot com>
 # License:      This file is placed in the public domain.
 #               No warranty, express or implied.
@@ -378,20 +378,19 @@ def swank_parse_inspect_content(pcont):
         logprint(str(el))
         if type(el) == list:
             if el[0] == ':action':
-                item = '<' + unquote(el[2]) + '> '
+                item = '{<' + unquote(el[2]) + '>'
+                tail = '<>}'
             else:
-                item = '[' + unquote(el[2]) + '] '
-            if linestart < 0:
-                lst.append("\n")
-                linestart = len(lst)
-            lst.insert(linestart, item)
+                item = '{[' + unquote(el[2]) + ']'
+                tail = '[]}'
+            lst.insert(len(lst), item)
             linestart = -1
             text = unquote(el[1])
             if text[-len(item):] == ' ' * len(item):
                 # If possible, remove spaces from the end in the length of item info
-                lst.append(text[:-len(item)])
+                lst.append(text[:-len(item)] + tail)
             else:
-                lst.append(text)
+                lst.append(text + tail)
         else:
             text = unquote(el)
             lst.append(text)
@@ -407,7 +406,12 @@ def swank_parse_inspect_content(pcont):
     buf = vim.current.buffer
     buf.append([''])
     buf.append("".join(lst).split("\n"))
-    buf.append(['', '[<<]'])
+    inspect_path = vim.eval('s:inspect_path')
+    if len(inspect_path) > 1:
+        ret = '[<<] Return to ' + ' -> '.join(inspect_path[:-1])
+    else:
+        ret = '[<<] Exit Inspector'
+    buf.append(['', ret])
     vim.command('normal! 3G0')
     vim.command('call SlimvHelp(2)')
     vim.command('call winrestview(oldpos)')
@@ -993,6 +997,8 @@ def swank_inspector_nth_action(n):
     swank_rex(':inspector-call-nth-action', cmd, 'nil', 't', str(n))
 
 def swank_inspector_pop():
+    # Remove the last two entries from the inspect path
+    vim.command('let s:inspect_path = s:inspect_path[:-2]')
     swank_rex(':inspector-pop', '(swank:inspector-pop)', 'nil', 't')
 
 def swank_inspect_in_frame(symbol, n):
