@@ -1,6 +1,6 @@
 " slimv.vim:    The Superior Lisp Interaction Mode for VIM
 " Version:      0.9.8
-" Last Change:  06 Jul 2012
+" Last Change:  22 Jul 2012
 " Maintainer:   Tamas Kovacs <kovisoft at gmail dot com>
 " License:      This file is placed in the public domain.
 "               No warranty, express or implied.
@@ -296,6 +296,8 @@ let s:sldb_level = -1                                     " Are we in the SWANK 
 let s:compiled_file = ''                                  " Name of the compiled file
 let s:current_buf = -1                                    " Swank action was requested from this buffer
 let s:current_win = -1                                    " Swank action was requested from this window
+let s:arglist_line = 0                                    " Arglist was requested in this line ...
+let s:arglist_col = 0                                     " ... and column
 let s:inspect_path = []                                   " Inspection path of the current object
 let s:skip_sc = 'synIDattr(synID(line("."), col("."), 0), "name") =~ "[Ss]tring\\|[Cc]omment"'
                                                           " Skip matches inside string or comment 
@@ -335,7 +337,7 @@ endfunction
 function! SlimvShortEcho( msg )
     let saved=&shortmess
     set shortmess+=T
-    exe "normal :echomsg a:msg\n"
+    exe "normal :echomsg a:msg\n" 
     let &shortmess=saved
 endfunction
 
@@ -727,7 +729,7 @@ function! SlimvOpenReplBuffer()
         inoremap <buffer> <silent>        <Up>     <C-R>=pumvisible() ? "\<lt>Up>" : "\<lt>C-O>:call SlimvHandleUp()\<lt>CR>"<CR>
         inoremap <buffer> <silent>        <Down>   <C-R>=pumvisible() ? "\<lt>Down>" : "\<lt>C-O>:call SlimvHandleDown()\<lt>CR>"<CR>
     else
-        inoremap <buffer> <silent>        <CR>     <C-R>=pumvisible() ? "\<lt>CR>" : "\<lt>C-O>:call SlimvHandleEnterRepl()\<lt>CR>"<CR>
+        inoremap <buffer> <silent>        <CR>     <C-R>=pumvisible() ? "\<lt>CR>" : SlimvHandleEnterRepl()<CR><C-O>:call SlimvArglistOnEnter()<CR>
         inoremap <buffer> <silent>        <C-Up>   <C-R>=pumvisible() ? "\<lt>Up>" : "\<lt>C-O>:call SlimvHandleUp()\<lt>CR>"<CR>
         inoremap <buffer> <silent>        <C-Down> <C-R>=pumvisible() ? "\<lt>Down>" : "\<lt>C-O>:call SlimvHandleDown()\<lt>CR>"<CR>
     endif
@@ -743,11 +745,13 @@ function! SlimvOpenReplBuffer()
         execute 'noremap <buffer> <silent> ' . g:slimv_leader.'/      :call SlimvSendCommand(1)<CR>'
         execute 'noremap <buffer> <silent> ' . g:slimv_leader.'<Up>   :call SlimvPreviousCommand()<CR>'
         execute 'noremap <buffer> <silent> ' . g:slimv_leader.'<Down> :call SlimvNextCommand()<CR>'
+        execute 'noremap <buffer> <silent> ' . g:slimv_leader.'-      :call SlimvClearReplBuffer()<CR>'
     elseif g:slimv_keybindings == 2
         execute 'noremap <buffer> <silent> ' . g:slimv_leader.'rs     :call SlimvSendCommand(0)<CR>'
         execute 'noremap <buffer> <silent> ' . g:slimv_leader.'ro     :call SlimvSendCommand(1)<CR>'
         execute 'noremap <buffer> <silent> ' . g:slimv_leader.'rp     :call SlimvPreviousCommand()<CR>'
         execute 'noremap <buffer> <silent> ' . g:slimv_leader.'rn     :call SlimvNextCommand()<CR>'
+        execute 'noremap <buffer> <silent> ' . g:slimv_leader.'rc     :call SlimvClearReplBuffer()<CR>'
     endif
 
     if g:slimv_repl_wrap
@@ -777,6 +781,14 @@ function! SlimvOpenReplBuffer()
     endif
 
     call SlimvRefreshReplBuffer()
+endfunction
+
+" Clear the contents of the REPL buffer, keeping the last prompt only
+function! SlimvClearReplBuffer()
+    if b:repl_prompt_line > 1
+        execute "normal! gg0d" . (b:repl_prompt_line-1) . "GG$"
+        let b:repl_prompt_line = 1
+    endif
 endfunction
 
 " Open a new Inspect buffer
@@ -844,7 +856,7 @@ function SlimvOpenSldbBuffer()
     setlocal foldmethod=marker
     setlocal foldmarker={{{,}}}
     setlocal foldtext=substitute(getline(v:foldstart),'{{{','','')
-    setlocal iskeyword+=+,-,*,/,%,<,=,>,:,$,?,!,@-@,94,~,#,\|,&,{,},[,]
+    setlocal iskeyword+=+,-,*,/,%,<,=,>,:,$,?,!,@-@,94,~,#,\|,&,{,},[,],.
     if g:slimv_sldb_wrap
         setlocal wrap
     endif
@@ -964,16 +976,21 @@ endfunction
 " Set 'iskeyword' option depending on file type
 function! s:SetKeyword()
     if SlimvGetFiletype() == 'clojure'
-        setlocal iskeyword+=+,-,*,/,%,<,=,>,:,$,?,!,@-@,94,~,#,\|,&
+        setlocal iskeyword+=+,-,*,/,%,<,=,>,:,$,?,!,@-@,94,~,#,\|,&,.
     else
-        setlocal iskeyword+=+,-,*,/,%,<,=,>,:,$,?,!,@-@,94,~,#,\|,&,{,},[,]
+        setlocal iskeyword+=+,-,*,/,%,<,=,>,:,$,?,!,@-@,94,~,#,\|,&,.,{,},[,]
     endif
 endfunction
 
 " Select symbol under cursor and return it
 function! SlimvSelectSymbol()
     call s:SetKeyword()
+    let oldpos = winsaveview()
+    if col('.') > 1 && getline('.')[col('.')-1] =~ '\s'
+        normal! h
+    endif
     let symbol = expand('<cword>')
+    call winrestview( oldpos )
     return symbol
 endfunction
 
@@ -1639,6 +1656,7 @@ function! SlimvSendCommand( close )
             else
                 " Expression is not finished yet, indent properly and wait for completion
                 " Indentation works only if lisp indentation is switched on
+                call SlimvArglist()
                 let l = line('.') + 1
                 call append( '.', '' )
                 call setline( l, repeat( ' ', SlimvIndent(l) ) )
@@ -1676,6 +1694,32 @@ function! SlimvCloseForm()
         endif
     endif
     normal! %
+endfunction
+
+" Handle insert mode 'Enter' keypress
+function! SlimvHandleEnter()
+    let s:arglist_line = line('.')
+    let s:arglist_col = col('.')
+    if g:paredit_mode && g:paredit_electric_return
+        return PareditEnter()
+    else
+        return "\<CR>"
+    endif
+endfunction
+
+" Display arglist after pressing Enter
+function! SlimvArglistOnEnter()
+    if s:arglist_line > 0
+        let l = line('.')
+        if getline(l) == ''
+            " Add spaces to make the correct indentation
+            call setline( l, repeat( ' ', SlimvIndent(l) ) )
+            normal! $
+        endif
+        call SlimvArglist( s:arglist_line, s:arglist_col )
+    endif
+    let s:arglist_line = 0
+    let s:arglist_col = 0
 endfunction
 
 " Handle insert mode 'Tab' keypress by doing completion or indentation
@@ -1789,19 +1833,21 @@ function! SlimvHandleEnterRepl()
     let end = s:CloseForm( cmd )
     if end != 'ERROR' && end != ''
         " Command part before cursor is unbalanced, insert newline
-        if g:paredit_mode && exists( 'g:paredit_electric_return' ) && g:paredit_electric_return && lastline > 0 && line( "." ) >= lastline
+        let s:arglist_line = line('.')
+        let s:arglist_col = col('.')
+        if g:paredit_mode && g:paredit_electric_return && lastline > 0 && line( "." ) >= lastline
             " Apply electric return
-            call feedkeys(PareditEnter(), 'n')
+            return PareditEnter()
         else
             " No electric return handling, just enter a newline
-            call feedkeys("\<CR>", 'n')
+            return "\<CR>"
         endif
-        return
     else
         " Send current command line for evaluation
         call cursor( 0, 99999 )
         call SlimvSendCommand(0)
     endif
+    return ''
 endfunction
 
 " Handle normal mode 'Enter' keypress in the SLDB buffer
@@ -2066,20 +2112,28 @@ function! SlimvDebugThread()
 endfunction
 
 " Display function argument list
-function! SlimvArglist()
-    let l = line('.')
-    let c = col('.') - 1
-    let line = getline('.')
+" Optional argument is the number of characters typed after the keyword
+function! SlimvArglist( ... )
+    if a:0
+        " Symbol position supplied
+        let l = a:1
+        let c = a:2 - 1
+    else
+        " Check symbol at cursor position
+        let l = line('.')
+        let c = col('.') - 1
+    endif
+    let line = getline(l)
     call s:SetKeyword()
-    if s:swank_connected && c > 1 && line[c-2] =~ '\k'
+    if s:swank_connected && c > 0 && line[c-1] =~ '\k\|)\|\]\|}\|"'
         let save_ve = &virtualedit
-        set virtualedit=onemore
+        set virtualedit=all
         " Display only if entering the first space after a keyword
         let matchb = max( [l-200, 1] )
         let [l0, c0] = searchpairpos( '(', '', ')', 'nbW', s:skip_sc, matchb )
         if l0 > 0
             " Found opening paren, let's find out the function name
-            let arg = matchstr( line, '\<\k*\>', c0 )
+            let arg = matchstr( getline(l0), '\<\k*\>', c0 )
             if arg != ''
                 " Ask function argument list from SWANK
                 call SlimvFindPackage()
@@ -2103,9 +2157,6 @@ function! SlimvArglist()
         endif
         let &virtualedit=save_ve
     endif
-
-    " Return empty string because this function is called from an insert mode mapping
-    return ''
 endfunction
 
 " Start and connect swank server
@@ -2655,7 +2706,12 @@ endfunction
 " Describe the selected symbol
 function! SlimvDescribeSymbol()
     if SlimvConnectSwank()
-        call SlimvCommandUsePackage( 'python swank_describe_symbol("' . SlimvSelectSymbol() . '")' )
+        let symbol = SlimvSelectSymbol()
+        if symbol == ''
+            call SlimvError( "No symbol under cursor." )
+            return
+        endif
+        call SlimvCommandUsePackage( 'python swank_describe_symbol("' . symbol . '")' )
     endif
 endfunction
 
@@ -2934,7 +2990,8 @@ endfunction
 " Initialize buffer by adding buffer specific mappings
 function! SlimvInitBuffer()
     " Map space to display function argument list in status line
-    inoremap <silent> <buffer> <Space>    <Space><C-R>=SlimvArglist()<CR>
+    inoremap <silent> <buffer> <Space>    <Space><C-O>:call SlimvArglist(line('.'),col('.')-1)<CR>
+    inoremap <silent> <buffer> <CR>       <C-R>=pumvisible() ?  "\<lt>CR>" : SlimvHandleEnter()<CR><C-O>:call SlimvArglistOnEnter()<CR>
     "noremap  <silent> <buffer> <C-C>      :call SlimvInterrupt()<CR>
     if !exists( 'b:au_insertleave_set' )
         let b:au_insertleave_set = 1
@@ -3048,6 +3105,7 @@ function! SlimvAddReplMenu()
     amenu &REPL.-REPLSep-                              :
     amenu &REPL.&Previous-Input                        :call SlimvPreviousCommand()<CR>
     amenu &REPL.&Next-Input                            :call SlimvNextCommand()<CR>
+    amenu &REPL.Clear-&REPL                            :call SlimvClearReplBuffer()<CR>
 endfunction
 
 " =====================================================================
