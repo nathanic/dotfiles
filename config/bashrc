@@ -20,7 +20,7 @@ case $HOSTNAME in
     hapax)
         export JAVA_HOME=~/local/jdk-6
         export ANDROID_HOME=~/local/android-sdk-linux
-        export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:$PATH
+        export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:~/local/glassfish3/bin:~/local/apache-jmeter/bin:$PATH
         ;;
     wintermute) 
         export JAVA_HOME=~/local/jdk-6
