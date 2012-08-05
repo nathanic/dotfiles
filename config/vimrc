@@ -101,6 +101,19 @@ let &guioptions = substitute(&guioptions, "T", "", "g")
 let g:vimclojure#HighlightBuiltins=1
 let g:vimclojure#ParenRainbow=1
 
+" SLIMV and paredit config
+let g:slimv_leader=','
+
+" default 500 -- too much is noticably slow to the point where i miss keys
+" right after parentheses...
+" let g:paredit_matchlines=1000
+let g:paredit_electric_return=1
+
+" i got used to \e for eval-form before i switched slimv_leader
+" and \e feels more ergnomic than ,e
+" TODO: make this mapping local to clojure buffers
+:nnoremap \e ,e
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Auto Commands
