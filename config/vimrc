@@ -30,6 +30,7 @@ set showmatch           " show matching parens
 set backspace=indent,eol,start  " backspace everything in insert mode
 set title               " change terminal title
 set scrolloff=4         " keep 4 lines off the edges of the screen when scrolling
+set virtualedit=block   " allow movement into virtual space when in block mode
 
 set splitbelow          " new windows below old ones
 set shiftround          " round to nearest multiple of shiftwidth
