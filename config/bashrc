@@ -294,6 +294,10 @@ function boxify() {
     rsync --bwlimit=1000 -a --partial --progress $* /media/boxee/
 }
 
+# ill-advised but handy
+alias killswanks="psgrep swank | awk '{print $2}' | xargs kill"
+
+
 [ -d ~/p/haskell/tidbits ] && alias tb="pushd ~/p/haskell/tidbits"
 
 # misc. host-specifics
