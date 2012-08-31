@@ -13,7 +13,7 @@ export EDITOR=/usr/bin/vim
 export CPATH=~/include:~/local/include:$CPATH
 case $HOSTNAME in
     hugin) 
-        export PATH=~/p/rb/arm-elf/bin:$PATH:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools
+        export PATH=/local/jdk-6/bin:~/local/glassfish3/bin:$PATH:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools
         export JAVA_HOME=~/local/glassfish3/jdk
         export ANDROID_HOME=~/local/android-sdk-linux
         ;;
