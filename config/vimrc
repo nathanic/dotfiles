@@ -260,12 +260,20 @@ iab <expr> _dt strftime("%F")
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " visual settings
 
-" may consider:
-" set t_Co=256
+set t_Co=256
 " colorscheme gardener
 " gardener is pretty but the hlsearch color needs to be red imho
 " but beware of how it would interact with cygwin or other crap terminals
-colorscheme koehler
+
+" koehler always looks good in a basic terminal 
+"colorscheme koehler
+
+" jellybeans is great in gvim or 256 color terminal
+colorscheme jellybeans
+
+" vilight is nice but has problems such as diff mode
+"colorscheme vilight
+
 
 " this looks good on my x11 on hugin at least.
 set guifont=Monospace\ 11
