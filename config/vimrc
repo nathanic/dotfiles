@@ -140,7 +140,7 @@ if has("autocmd")
 
         " Show invisible characters in all of these files
         autocmd filetype vim,c,cpp,perl,haskell,make,python,rst,ruby setlocal list
-        autocmd filetype javascript,css setlocal list
+        autocmd filetype javascript,css,html setlocal list
     augroup end "}}}
 
     "http://www.cs.kent.ac.uk/people/staff/cr3/toolbox/haskell/Vim/vim.html
