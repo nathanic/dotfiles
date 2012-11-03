@@ -265,11 +265,13 @@ set t_Co=256
 " gardener is pretty but the hlsearch color needs to be red imho
 " but beware of how it would interact with cygwin or other crap terminals
 
-" koehler always looks good in a basic terminal 
-"colorscheme koehler
-
-" jellybeans is great in gvim or 256 color terminal
-colorscheme jellybeans
+if $TERM == "screen"
+    " koehler always looks good in a basic terminal 
+    colorscheme koehler
+else
+    " jellybeans is great in gvim or 256 color terminal
+    colorscheme jellybeans
+end
 
 " vilight is nice but has problems such as diff mode
 "colorscheme vilight
