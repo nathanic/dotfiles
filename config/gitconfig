@@ -1,18 +1,21 @@
 [user]
 	name = Nathan Stien
-	email = nathanism@gmail.com
+    email = nathanism@gmail.com
 [color]
 	diff = auto
 	status = auto
 	branch = auto
 [alias]
     # lot of good ideas http://git.wiki.kernel.org/index.php/Aliases
+    # also http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
     # briefer status output
     st = status -sb
     # run 'git rm' on files already deleted outside of git
     rmdead = !git ls-files --deleted | xargs git rm 
     # list new commits after a fetch
     lc = log ORIG_HEAD.. --stat --no-merges
+    # brief, colorized listing with files that changed, in a pager
+    ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
     # useful at times that i have a more exotic default diff (vimdiff)
     rdiff = diff --no-ext-diff
     # highlight differing words instead of lines
