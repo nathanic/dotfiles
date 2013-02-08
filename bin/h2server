@@ -1,0 +1,11 @@
+#!/bin/sh
+# nathan p. stien 2013-02-08
+# find the latest version of h2 in the local maven repo
+H2VERSION=$(ls ~/.m2/repository/com/h2database/h2/ | grep '^[.0-9]*$' | tail -n 1)
+
+if [ -z $H2VERSION ]; then
+    echo "NOPE: I can't find any h2 jars installed in your maven repo."
+else
+    echo detected H2 version is $H2VERSION.
+    java -cp ~/.m2/repository/com/h2database/h2/${H2VERSION}/h2-${H2VERSION}.jar org.h2.tools.Server $@
+fi
