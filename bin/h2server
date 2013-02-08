@@ -1,6 +1,6 @@
 #!/bin/sh
-# nathan p. stien 2013-02-08
-# find the latest version of h2 in the local maven repo
+# Nathan P. Stien 2013-02-08
+# find and run the latest version of h2 in the local maven repo
 H2VERSION=$(ls ~/.m2/repository/com/h2database/h2/ | grep '^[.0-9]*$' | tail -n 1)
 
 if [ -z $H2VERSION ]; then
