@@ -8,6 +8,11 @@
 #   ln -s dotfiles/config/foorc ~/.foorc
 #   ln -s ../dotfiles/bin/foo ~/bin/foo
 
+# this script could probably now be replaced with a simple shell script
+# most of it is just
+#   $ for f in dotfiles/config/*; do ln -s $f ".$(basename $f)"; done
+
+
 import sys, os
 import filecmp
 
