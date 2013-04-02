@@ -21,6 +21,11 @@ case $HOSTNAME in
         export JAVA_HOME=~/local/jdk-6
         export ANDROID_HOME=~/local/android-sdk-linux
         export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:~/local/glassfish3/bin:~/local/apache-jmeter/bin:$PATH
+        export PERL_LOCAL_LIB_ROOT="/home/nathan/perl5";
+        export PERL_MB_OPT="--install_base /home/nathan/perl5";
+        export PERL_MM_OPT="INSTALL_BASE=/home/nathan/perl5";
+        export PERL5LIB="/home/nathan/perl5/lib/perl5/x86_64-linux-gnu-thread-multi:/home/nathan/perl5/lib/perl5";
+        export PATH="/home/nathan/perl5/bin:$PATH";
         ;;
     wintermute) 
         export JAVA_HOME=~/local/jdk-6
@@ -51,6 +56,7 @@ esac
 # pathcons, pathsnoc
 export PATH=~/bin:~/dotfiles/bin:$PATH:/var/lib/gems/1.8/bin
 export PYTHONPATH=~/lib/python
+
 
 # set up the p4 environment if possible
 [ -f ~/.p4_credentials ] && source ~/.p4_credentials
@@ -106,6 +112,8 @@ shopt -s cdspell
 
 # don't overwrite .bash_history
 shopt -s histappend
+# sync history between bashes http://briancarper.net/blog/248/
+#export PROMPT_COMMAND="history -a; history -n"
 
 shopt -s no_empty_cmd_completion
 shopt -s shift_verbose
@@ -362,6 +370,13 @@ fi
 nicemount() { (echo "DEVICE PATH TYPE FLAGS" && mount | awk '$2=$4="";1') | column -t; }
 wiki() { dig +short txt $1.wp.dg.cx; }
 
+# http://mmb.pcb.ub.es/~carlesfe/unix/tricks.txt
+function lt() { ls -ltrsa "$@" | tail; }
+#function psgrep() { ps axuf | grep -v grep | grep "$@" -i --color=auto; }
+function fname() { find . -iname "*$@*"; }
+
+
+
 # http://wiki.github.com/rupa/j
 
 # maintains a jump-list of directories you actually use
@@ -434,3 +449,4 @@ j() {
 complete -C 'j --complete "$COMP_LINE"' j
 # prepend to PROMPT_COMMAND
 PROMPT_COMMAND='j --add "$(pwd -P)";'"$PROMPT_COMMAND"
+
