@@ -48,11 +48,15 @@ alias moutn=mount
 alias grep='grep --color'
 alias cgrep='grep --color=always'  # for use with pipes like less
 
+# C/C++ ack
 alias cack='ack --cc --cpp'
+# ack into less
 alias ackl='ack --pager="less -R"'
+# C/C++ ack into less
 alias cackl='ack --cc --cpp --pager="less -R"'
 
 # be 'nice' about both io scheduling and CPU scheduling
+# $ verynice <command>
 alias verynice='ionice -c3 nice'
 
 # remote copy (interactive); uses args like scp
@@ -63,35 +67,8 @@ alias rcopy='rsync -a --rsh=ssh --partial --progress'
 alias lancopy='rsync --bwlimit=1000 -a --rsh=ssh --partial --progress'
 alias slowcopy='rsync --bwlimit=100 -a --rsh=ssh --partial --progress'
 
-alias cleanpending='rm /home/nathan/store/bt/pending/*.torrent'
-
-# lancopy specifically to valis
-function valisify() {
-    rsync --bwlimit=1000 -a --rsh=ssh --partial --progress $* valis:/myth/videos
-}
-
-# lancopy specifically to boxee
-function boxify() {
-    rsync --bwlimit=1000 -a --partial --progress $* /media/boxee/
-}
-
-# ill-advised but handy
+# ill-advised but handy sometimes
 alias killswanks="psgrep swank | awk '{print $2}' | xargs kill"
-
-# quick access to my small scale haskell experiments
-[ -d ~/p/haskell/tidbits ] && alias tb="pushd ~/p/haskell/tidbits"
-
-# misc. host-specifics
-if [ $HOSTNAME = lildeb ]; then
-    # silly hack for multi-ad workstation:
-    alias d0='export DISPLAY=localhost:10.0'
-    alias nxp='ssh octavius'
-elif [ $HOSTNAME = dev1 ]; then  # crappy solaris workarounds
-    alias wget='curl -O'
-    alias top='TERM=xterm top -c -C infinity'
-    alias less='TERM=xterm less -R'
-    alias vi=vim
-fi
 
 # functional style "apply cmd arg0 [arg1 [...]]"
 # -> cmd arg0; cmd arg1; ...
