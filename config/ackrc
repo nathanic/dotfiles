@@ -2,3 +2,4 @@
 --type-set=cpp=.h,.c,.cpp,.cp
 --type-set=haskell=.hs,.lhs,.chs
 --type-add=html=.thtml,.temail
+--type-add=clojure=.cljs
