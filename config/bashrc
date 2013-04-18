@@ -153,13 +153,15 @@ esac
 
 # enable fancy git prompt if possible
 if [ "$(type -t __git_ps1)" == "function" ]; then
-    gitsection="$RED\$(__git_ps1 '(%s)')"
+    gitsection="\[$RED\]\$(__git_ps1 '(%s)')"
 else
     gitsection=""
 fi
 
+# \[ and \] tell bash that the enclosed characters are non-printing,
+# so it can calculate screen usage; see http://mywiki.wooledge.org/BashFAQ/053
 prefix=${debian_chroot:+($debian_chroot)}
-PS1="$prefix$usercolor\u$PLAIN$YELLOW@$hostcolor\h$PLAIN:$curdircolor\w${gitsection}$PLAIN$RESET\$ "
+PS1="$prefix\[$usercolor\]\u\[$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:\[$curdircolor\]\w${gitsection}\[$PLAIN$RESET\]\$ "
 
 # extra git info
 GIT_PS1_SHOWDIRTYSTATE=1 #... untagged(*) and staged(+) changes
