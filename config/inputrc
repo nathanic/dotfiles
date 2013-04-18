@@ -6,5 +6,5 @@ set completion-ignore-case On
 set bell-style none
 set blink-matching-paren on
 
-# vi-mode doesn't have these
+# vi-mode doesn't have this, for some reason
 C-l: clear-screen
