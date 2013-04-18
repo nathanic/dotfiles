@@ -32,7 +32,8 @@ set title               " change terminal title
 set scrolloff=4         " keep 4 lines off the edges of the screen when scrolling
 set virtualedit=block   " allow movement into virtual space when in block mode
 
-set splitbelow          " new windows below old ones
+set splitbelow          " new split windows below old ones
+set splitright          " new vsplits to the right
 set shiftround          " round to nearest multiple of shiftwidth
 
 set statusline=%F%m%r%h%w\ %{&ff}\ %{&ft}\ %P\ (%l,%v)\ %{fugitive#statusline()}
