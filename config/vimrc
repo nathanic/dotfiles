@@ -253,13 +253,27 @@ nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
 " work around a typo i make constantly (:W for :w)
 command W w
 
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Abbreviations
+
+
 " quickly mark a file as vim outliner format
 iab ftvo vi:ft=vo_base
 
 " insert YYYY-MM-DD
 iab <expr> _dt strftime("%F")
 
+" insert HH:MM
+iab <expr> _tt strftime("%T")
+
+" insert YYYY-MM-DD HH:MM
+iab <expr> _dtt strftime("%F %T")
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " visual settings
 
 set t_Co=256
