@@ -11,7 +11,12 @@
 " General behavioral settings
 
 " use pathogen for sanity
-call pathogen#runtime_append_all_bundles()
+"call pathogen#runtime_append_all_bundles()
+" infect seems necessary to get ftdetects to work
+call pathogen#infect()
+" hmm but see also:
+" http://stackoverflow.com/questions/3383502/pathogen-does-not-load-plugins
+
 filetype plugin indent on
 
 set nocompatible        " vi sucks, long live vim
@@ -150,12 +155,6 @@ if has("autocmd")
     " support MASI::Template files as html
     au BufNewFile,BufReadPost *.thtml setl filetype=html
 
-    " i don't know why the bundled ftdetect isn't covering this...
-    autocmd BufNewFile,BufRead *.coffee set filetype=coffee
-
-    " do i have to do everything myself?
-    au BufNewFile,BufRead *.clj set filetype=clojure
-    au BufNewFile,BufRead *.cljs set filetype=clojure
 endif " has("autocmd")
 
 
