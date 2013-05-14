@@ -252,6 +252,8 @@ nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
 " work around a typo i make constantly (:W for :w)
 command W w
 
+" quickly make a file into a vim-outliner file
+command Vo set ft=vo_base | put ='vi:ft=vo_base'
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
