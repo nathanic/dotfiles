@@ -155,6 +155,8 @@ if has("autocmd")
     " support MASI::Template files as html
     au BufNewFile,BufReadPost *.thtml setl filetype=html
 
+    au BufNewFile,BufReadPost Vagrantfile setl filetype=ruby
+
 endif " has("autocmd")
 
 
@@ -252,8 +254,11 @@ nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
 " work around a typo i make constantly (:W for :w)
 command W w
 
-" quickly make a file into a vim-outliner file
-command Vo set ft=vo_base | put ='vi:ft=vo_base'
+" quickly make a file into a vim-outliner file:
+    " set filetype,
+    " insert modeline to set filetype (at current cursor pos)
+    " replace spaces with literal tabs required by vim-outliner
+command Vo set ft=vo_base | put ='vi:ft=vo_base' | %s/    /\t/g
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
