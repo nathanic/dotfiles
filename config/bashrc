@@ -190,7 +190,7 @@ fi
 
 # keychain ssh key management (non-interactive)
 # TODO: just detect the files?  maybe keychain can auto-add.
-if [ -x "`which keychain`" ]; then  
+if [ -x "$(which keychain 2> /dev/null)" ]; then  
     # i really need to clean up my key filenames...
     keychain --quiet --ignore-missing \
         ~/.ssh/id_rsa                 \
