@@ -104,7 +104,6 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-usercolor=$GREEN
 hostcolor=$GREEN
 curdircolor=${BOLD}${BLUE}
 
@@ -125,10 +124,18 @@ case "$HOSTNAME" in
 esac
 
 case "$USER" in
-    nathan|nstien|Nathan|"Nathan Stien") ;;
-    # NB: root should never get here, but this is to alert me in case.
-    root|Administrator) usercolor=$BOLD$RED ;;
-    *)                  usercolor=$BOLD$YELLOW ;;
+    nathan|nstien|Nathan|"Nathan Stien") 
+        usercolor=$GREEN
+        terminator=∫
+        ;;
+    root|Administrator) 
+        usercolor=$BOLD$RED;
+        terminator='#'
+        ;;
+    *)
+        usercolor=$BOLD$YELLOW
+        terminator='\$'
+        ;;
 esac
 
 # idea: re-eval prompt colors on every prompt
@@ -158,10 +165,11 @@ else
     gitsection=""
 fi
 
+
 # \[ and \] tell bash that the enclosed characters are non-printing,
 # so it can calculate screen usage; see http://mywiki.wooledge.org/BashFAQ/053
 prefix=${debian_chroot:+($debian_chroot)}
-PS1="$prefix\[$usercolor\]\u\[$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:\[$curdircolor\]\w${gitsection}\[$PLAIN$RESET\]\$ "
+PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:\[$curdircolor\]\w${gitsection}\[$PLAIN$RESET\]$terminator "
 
 # extra git info
 GIT_PS1_SHOWDIRTYSTATE=1 #... untagged(*) and staged(+) changes
