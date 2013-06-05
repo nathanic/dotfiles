@@ -111,12 +111,9 @@ case "$HOSTNAME" in
     hugin)          hostcolor=${BLUE} ;;
     wintermute)     hostcolor=$BOLD$WHITE;;
     dev1)           hostcolor=$BOLD$CYAN ;;
-    lildeb)         hostcolor=${BOLD}${YELLOW} ;;
     munin)          hostcolor=$RED ;;
-    nathan-imac)    hostcolor=$BOLD$WHITE ;;
-    nathan-xp)      ;;
-    octavius)       ;;
     xathan)         hostcolor=$MAGENTA ;;
+    dathan)         hostcolor=${BOLD}${YELLOW} ;;
     hapax)          hostcolor=${BOLD}${WHITE} ;;
     gir)            ;;
     prod-app01.bits.illinoisstate.edu)   hostcolor=$BOLD$CYAN ;;
