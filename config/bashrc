@@ -134,7 +134,7 @@ case "$USER" in
         ;;
     *)
         usercolor=$BOLD$YELLOW
-        terminator='\$'
+        terminator='$'
         ;;
 esac
 
