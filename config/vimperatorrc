@@ -1,4 +1,8 @@
-"3.2 (created: 2011/06/03 11:51:34)
+"3.7 (created: 2013/04/03 18:20:07)
+" vi:ft=vim
+
+" TODO: strip mine this for ideas
+" https://github.com/travisjeffery/vimperator-config
 
 nmap <C-1> :1tn<Return>
 nmap <C-2> :2tn<Return>
@@ -10,6 +14,13 @@ nmap <C-7> :7tn<Return>
 nmap <C-8> :8tn<Return>
 nmap <C-9> :9tn<Return>
 nmap <C-0> :tablast<Return>
+
+ignorekeys add pinboard\\.in
+ignorekeys add owa\\.illinoisstate\\.edu
+ignorekeys add mail\\.google\\.com
+ignorekeys add www\\.pandora\\.com
+
 source! /home/nathan/.vimperatorrc.local
+
 
 " vim: set ft=vimperator:
