@@ -121,7 +121,7 @@ case "$HOSTNAME" in
 esac
 
 case "$USER" in
-    nathan|nstien|Nathan|"Nathan Stien") 
+    nathan|nstien|npstien|Nathan|"Nathan Stien") 
         usercolor=$GREEN
         terminator=∫
         ;;
