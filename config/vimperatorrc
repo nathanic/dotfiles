@@ -15,10 +15,11 @@ nmap <C-8> :8tn<Return>
 nmap <C-9> :9tn<Return>
 nmap <C-0> :tablast<Return>
 
-ignorekeys add pinboard\\.in
+ignorekeys add pinboard\\.in/add
 ignorekeys add owa\\.illinoisstate\\.edu
 ignorekeys add mail\\.google\\.com
 ignorekeys add www\\.pandora\\.com
+ignorekeys add www\\.newsblur\\.com
 
 source! /home/nathan/.vimperatorrc.local
 
