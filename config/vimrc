@@ -285,6 +285,8 @@ iab <expr> _tt strftime("%T")
 " insert YYYY-MM-DD HH:MM
 iab <expr> _dtt strftime("%F %T")
 
+" insert an integral symbol
+iab _intg ∫
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
