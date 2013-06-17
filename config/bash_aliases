@@ -36,6 +36,10 @@ alias dap='dcop amarok player'
 alias amadd='dcop amarok playlist addMedia'
 alias alert='play --silent /usr/share/sounds/phone.wav'
 
+# generate some concentration-enhancing(?) brown noise with sox
+# from interesting hn thread https://news.ycombinator.com/item?id=5872414
+alias brownnoise='play --show-progress -c 2 --null synth brownnoise reverb bass 6 treble -3 echos 0.8 0.9 1000 0.3 1800 0.25'
+
 # ds will print a nice disk usage summary.  
 # dsraw will do it without human-readable file sizes
 alias dsraw='du -xs * | sort -n'   # find the piggies
