@@ -100,18 +100,19 @@ if &t_Co > 2 || has("gui_running")
     syntax on          " enable syntax highlighting
 endif
 
-if has("gui_running")
-    " only looks good in the GUI
-    "set cursorline          " highlight the current line
-endif
+" if has("gui_running")
+"     " only looks good in the GUI (if even that)
+"     set cursorline          " highlight the current line
+"     set cursorcolumn
+" endif
 
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Configuration variables
+" Configuration variables for plugins and such
 
 " TODO: check platform, existence of binaries, etc.
-let g:haddock_browser = "/usr/bin/konqueror"
+let g:haddock_browser = "firefox"
 let g:haddock_indexfiledir = "~/.vim/"
 " huzzah for doxygen
 let g:load_doxygen_syntax=1
@@ -135,11 +136,6 @@ let g:slimv_leader=','
 " right after parentheses...
 " let g:paredit_matchlines=1000
 let g:paredit_electric_return=1
-
-" i got used to \e for eval-form before i switched slimv_leader
-" and \e feels more ergnomic than ,e
-" TODO: make this mapping local to clojure buffers
-:nnoremap \e ,e
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
