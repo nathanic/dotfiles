@@ -55,12 +55,31 @@ set mouse=              " disable mouse usage in terminal
 set wildmenu            " show a listing of wildcard completions
 set wildmode=longest,full " make completion more bash-like
 set wildignore=*.swp,*.bak,*.pyc,*.class,*.o
+" ignore case when completing filenames and directories when supported
+if v:version > 703 || (v:version == 703 && has("patch72"))
+    set wildignorecase
+endif
 
-set clipboard=unnamed   " use gui clipboard if possible
+" use gui clipboard if possible
+set clipboard=unnamed
+" directly use clipboard register when supported (X11 only)
+if has("unnamedplus")
+    set clipboard+=unnamedplus
+endif
 
 set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·
 set nolist                      " don't show invisible characters by default,
                                 " but it is enabled for some file types (see later)
+
+set virtualedit=block " allow cursor to move past last character in block mode
+
+" prevent jumping over wrapped lines
+nnoremap <silent> j gj
+nnoremap <silent> k gk
+
+" redraw window so search terms are centered
+nnoremap n nzz
+nnoremap N Nzz
 
 " python, haskell, and softtabstop have made me a spaces man
 set autoindent
@@ -70,7 +89,8 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab           " write spaces instead of \t
 set smarttab
-set foldmethod=syntax
+"set foldmethod=syntax
+set foldmethod=marker
 set foldlevel=99
 set matchpairs+=<:>
 
@@ -170,10 +190,42 @@ endif " has("autocmd")
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
-command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-        \ | wincmd p | diffthis
+" command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+"         \ | wincmd p | diffthis
 
+" improved DiffOrig from acx0
+nnoremap <Leader>do :call DiffOrig()<cr>
+command! DiffOrig :call DiffOrig()
+function! DiffOrig()
+    if !exists("b:diff_active") && &buftype == "nofile"
+        echoerr "E: Cannot diff a scratch buffer"
+        return -1
+    elseif expand("%") == "" || !filereadable(expand("%"))
+        echoerr "E: Buffer doesn't exist on disk"
+        return -1
+    endif
 
+    if !exists("b:diff_active") || b:diff_active == 0
+        let b:diff_active = 1
+        let l:orig_filetype = &l:filetype
+
+        leftabove vnew
+        let t:diff_buffer = bufnr("%")
+        set buftype=nofile
+
+        read #
+        0delete_
+        let &l:filetype = l:orig_filetype
+
+        diffthis
+        wincmd p
+        diffthis
+    else
+        diffoff
+        execute "bdelete " . t:diff_buffer
+        let b:diff_active = 0
+    endif
+endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Keystrokes
@@ -245,6 +297,22 @@ nnoremap <F1>  :TrinityToggleNERDTree<cr>
 nnoremap <F2>  :TagbarToggle<cr>
 nnoremap <F3>  :TrinityToggleSourceExplorer<cr>
 
+" remove trailing whitespace
+nnoremap _$ :call PreservePosition("%s/\\s\\+$//e")<CR>
+
+" santa's little helper
+function! PreservePosition(command)
+" save last search, and cursor position
+    let l:search = @/
+    let l:line = line(".")
+    let l:column = col(".")
+
+    execute a:command
+" restore previous search history, and cursor position
+    let @/ = l:search
+    call cursor(l:line, l:column)
+endfunction
+
 " filter through xml tidy (must be available on path)
 " select xml text in visual mode to use
 vnoremap ,x :!tidy -q -i --indent-spaces 4 -xml<CR>
@@ -259,8 +327,8 @@ nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 " emergency stop for overtone synthesizer
 nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
 
-" work around a typo i make constantly (:W for :w)
-command W w
+" write to root-owned file when running as non-root
+command! W write !sudo tee % > /dev/null
 
 " quickly make a file into a vim-outliner file:
     " set filetype,
@@ -268,6 +336,28 @@ command W w
     " replace spaces with literal tabs required by vim-outliner
 command Vo set ft=vo_base | put ='vi:ft=vo_base' | %s/    /\t/g
 
+" clean up buffer list by wiping out unmodified, hidden, no name buffers
+nnoremap <Leader>de :call RemoveEmptyBuffers()<CR>
+
+function! RemoveEmptyBuffers()
+    let s:empty_buffers = filter(range(1, bufnr("$")),
+                \ "buflisted(v:val) && empty(bufname(v:val)) && bufwinnr(v:val) < 0 && !getbufvar(v:val, '&mod')")
+
+    if !empty(s:empty_buffers)
+        execute "bwipeout " . join(s:empty_buffers, " ")
+    endif
+endfunction
+
+" append modeline after last line in buffer
+nnoremap <Leader>ml :call AppendModeline()<CR>
+
+function! AppendModeline()
+    let l:modeline = printf(" vim: set ts=%d sts=%d sw=%d %s :",
+                \ &l:tabstop, &l:softtabstop, &l:shiftwidth, &l:expandtab ? "et" : "noet")
+    let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
+    call append(line("$"), "")
+    call append(line("$"), l:modeline)
+endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Abbreviations
@@ -335,4 +425,63 @@ nnoremap <silent> <Leader>o
 \   let w:long_line_match = matchadd('ErrorMsg', '\%>80v.\+', -1) <Bar>
 \ endif<CR>
 
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" prose writing (ganked from acx0)
+" modes:
+" notes - hard wrap at 78 characters, don't reformat text after changes
+" email - hard wrap at 78 characters, reformat text after changes
+" essay - soft wrap at end of line (for copying to other word processors)
+let g:default_prose_mode = "notes"
+
+nnoremap <Leader>tp :call ToggleProse()<CR>
+
+function! ToggleProse()
+    if exists("b:prose_mode") && b:prose_mode != "off"
+        call SetProse("off")
+    else
+        call SetProse(g:default_prose_mode)
+    endif
+endfunction
+
+command! -nargs=1 SetProse call SetProse(<f-args>)
+function! SetProse(mode)
+    if !exists("b:prose_mode")
+        let b:prose_mode = a:mode
+        let b:old_formatoptions = &formatoptions
+        let b:old_textwidth = &textwidth
+    endif
+
+    setlocal nonumber
+    setlocal wrap
+    setlocal spell
+
+    if a:mode == "notes"
+        setlocal textwidth=78
+        setlocal formatoptions=tcq
+    elseif a:mode == "email"
+        setlocal textwidth=72
+        setlocal formatoptions=tcqa
+    elseif a:mode == "essay"
+        setlocal linebreak
+        setlocal formatoptions=q
+    else
+        setlocal number
+        setlocal nospell
+        setlocal nolinebreak
+
+        let &l:textwidth = b:old_textwidth
+        let &l:formatoptions = b:old_formatoptions
+
+        if a:mode != "off"
+            echoerr "E: Prose mode '" . a:mode . "' not defined"
+            return -1
+        endif
+    endif
+
+    let b:prose_mode = a:mode
+    echo a:mode == "off" ? "noprose" : " prose (" . a:mode . ")"
+endfunction
 
