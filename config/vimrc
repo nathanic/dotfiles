@@ -323,8 +323,11 @@ nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 " emergency stop for overtone synthesizer
 nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
 
+" support :W for :w -- I fat-finger this all the time
+command! W w
+
 " write to root-owned file when running as non-root
-command! W write !sudo tee % > /dev/null
+command! Wsudo write !sudo tee % > /dev/null
 
 " quickly make a file into a vim-outliner file:
     " set filetype,
