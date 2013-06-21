@@ -78,8 +78,8 @@ nnoremap <silent> j gj
 nnoremap <silent> k gk
 
 " redraw window so search terms are centered
-nnoremap n nzz
-nnoremap N Nzz
+" nnoremap n nzz
+" nnoremap N Nzz
 
 " python, haskell, and softtabstop have made me a spaces man
 set autoindent
@@ -455,7 +455,7 @@ function! SetProse(mode)
 
     setlocal nonumber
     setlocal wrap
-    setlocal spell
+    " setlocal spell
 
     if a:mode == "notes"
         setlocal textwidth=78
