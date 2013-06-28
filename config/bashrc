@@ -73,6 +73,9 @@ shopt -s no_empty_cmd_completion
 shopt -s shift_verbose
 #shopt -s checkhash
 
+# when enabled, ** will glob recursively
+shopt -s globstar
+
 # disable annoying console beep
 [ -x setterm ] && setterm -blength 0
 
@@ -162,11 +165,42 @@ else
     gitsection=""
 fi
 
+# TODO: refactor prompt logic into another file
+        # but with a sensible fallback if that file is not found
+# TODO: this logic for each individual dir along the path
+function pathcolorize() {
+    # default color
+    local dircolor=$BOLD$BLUE;
+    local here=$(pwd)/;
+    local perms=$(stat --format=%a $here);
+    # TODO: refactor friendly pwd business to another fn?
+    local friendly=${here/$HOME\//\~\/}
+    friendly=${friendly/%\/}
+    if [[ -h $(pwd) ]]; then
+        # dir is a symlink
+        dircolor=$BOLD$CYAN;
+    elif [[ "$perms" -eq 700 ]]; then
+        # private-only dir
+        dircolor=$RED;
+    elif [[ "$perms" -eq 777 ]]; then
+        # world-writable dir
+        dircolor=$YELLOW;
+    fi
+    # any other cases?  non-owned dir?  group-writable dir?
+    # TODO: figure out how to get \[ and \] into this properly
+    # it seems they are treated literally in $PS1 when they come from variable
+    # substitution.
+    # echo "\[$dircolor\]$friendly\[$PLAIN\]";
+    echo "$dircolor$friendly$PLAIN";
+}
 
+dirsection='`pathcolorize`'
 # \[ and \] tell bash that the enclosed characters are non-printing,
 # so it can calculate screen usage; see http://mywiki.wooledge.org/BashFAQ/053
 prefix=${debian_chroot:+($debian_chroot)}
-PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:\[$curdircolor\]\w${gitsection}\[$PLAIN$RESET\]$terminator "
+# PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:\[$curdircolor\]\w${gitsection}\[$PLAIN$RESET\]$terminator "
+# PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:${dirsection}${gitsection}\[$PLAIN$RESET\]$terminator "
+PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:${dirsection}${gitsection}\[$PLAIN$RESET\]$terminator "
 
 # extra git info
 GIT_PS1_SHOWDIRTYSTATE=1 #... untagged(*) and staged(+) changes
