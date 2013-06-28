@@ -23,5 +23,6 @@ ignorekeys add www\\.newsblur\\.com
 
 source! /home/nathan/.vimperatorrc.local
 
+set defsearch=duckduckgo
 
 " vim: set ft=vimperator:
