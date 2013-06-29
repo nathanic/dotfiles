@@ -9,7 +9,9 @@ umask 002
 export EDITOR=/usr/bin/vim
 
 # various paths
-export CPATH=~/include:~/local/include:$CPATH
+# possibly break them out into per-machine local files
+export CPATH=~/local/include:$CPATH
+
 case $HOSTNAME in
     hugin) 
         export PATH=~/local/jdk-7/bin:~/local/glassfish3/bin:$PATH:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools
@@ -33,18 +35,20 @@ case $HOSTNAME in
         ;;
 esac
 
-# ensure my personal tmp exists
-[ -d ~/tmp/ ] || mkdir ~/tmp
-
 [ -d ~/.cabal/ ] && export PATH=~/.cabal/bin:$PATH
-[ -d ~/scripts/shell ] && export PATH=~/scripts/shell:$PATH
 # maybe a function pathadd() to encapsulate the above pattern?
 # pathcons, pathsnoc
+# see https://github.com/jdevera/dotfiles/blob/master/bash.d/010_env_functions.sh
 export PATH=~/bin:~/dotfiles/bin:$PATH:/var/lib/gems/1.8/bin
 export PYTHONPATH=~/lib/python
 
-# the rest of this only matters if this shell is interactive
+
+######################################################################
+# Interactive-Only Configuration Below This Point
 [ -z "$PS1" ] && return
+
+# ensure my personal tmp exists
+[ -d ~/tmp/ ] || mkdir ~/tmp
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -56,6 +60,9 @@ export PYTHONPATH=~/lib/python
 export HISTCONTROL=ignoreboth
 export HISTIGNORE="[   ]*:&:bg:fg:exit"
 
+### shell options
+# see http://wiki.bash-hackers.org/internals/shell_options
+
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
@@ -66,6 +73,8 @@ shopt -s cdspell
 
 # don't overwrite .bash_history
 shopt -s histappend
+
+# TODO maybe enable this, be careful with other $PROMPT_COMMAND in .bash_prompt
 # sync history between bashes http://briancarper.net/blog/248/
 #export PROMPT_COMMAND="history -a; history -n"
 
@@ -73,160 +82,25 @@ shopt -s no_empty_cmd_completion
 shopt -s shift_verbose
 #shopt -s checkhash
 
-# when enabled, ** will glob recursively
+# enable recursive globbing for **
 shopt -s globstar
 
 # disable annoying console beep
 [ -x setterm ] && setterm -blength 0
 
 # make less more friendly for non-text input files, see lesspipe(1)
-# sets $LESSOPEN variable
 #[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
 [ -x $HOME/bin/lesspipe.sh ] && eval "$($HOME/bin/lesspipe.sh)"
 export LESS_ADVANCED_PREPROCESSOR=yes
+# TODO: vimpager if possible
 
-# ansi styling
-# now following the advice of http://mywiki.wooledge.org/BashFAQ/037
-# with some help from http://wiki.bash-hackers.org/scripting/terminalcodes
-RESET=$(tput sgr0)
-BOLD=$(tput bold)
-NOBOLD=$(tput rmso)
-
-BLACK=$(tput setaf 0)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-CYAN=$(tput setaf 6)
-WHITE=$(tput setaf 7)
-PLAIN=$(tput setaf 9)
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-hostcolor=$GREEN
-curdircolor=${BOLD}${BLUE}
-
-case "$HOSTNAME" in 
-    hugin)          hostcolor=${BLUE} ;;
-    wintermute)     hostcolor=$BOLD$WHITE;;
-    dev1)           hostcolor=$BOLD$CYAN ;;
-    munin)          hostcolor=$RED ;;
-    xathan)         hostcolor=$MAGENTA ;;
-    dathan)         hostcolor=${BOLD}${YELLOW} ;;
-    hapax)          hostcolor=${BOLD}${WHITE} ;;
-    gir)            ;;
-    prod-app01.bits.illinoisstate.edu)   hostcolor=$BOLD$CYAN ;;
-    prod-app02.bits.illinoisstate.edu)   hostcolor=$BOLD$CYAN ;;
-esac
-
-case "$USER" in
-    nathan|nstien|npstien|Nathan|"Nathan Stien") 
-        usercolor=$GREEN
-        terminator=∫
-        ;;
-    root|Administrator) 
-        usercolor=$BOLD$RED;
-        terminator='#'
-        ;;
-    *)
-        usercolor=$BOLD$YELLOW
-        terminator='$'
-        ;;
-esac
-
-# idea: re-eval prompt colors on every prompt
-# do something interesting with pathcolor based on $PWD
-# maybe alter shade for outside of $HOME tree?
-# different color for network shares?
-# ! detect symlinks in the path and highlight them individually cyan? !
-    # split dir into components
-        # recursive method
-            # $ basename $(dirname $(dirname /foo/bar/baz/quux))
-            # bar
-    # pick highlight based on is_symlink
-    # implementation choices
-        # figure out how to do this in bash
-        # embed a small python script in bash
-            # then we require python for this feature
-                # [ -x $(which python) ] && do_python_thing
-            # performance: have to launch python every shell
-# any other highlighting of path nodes?  
-    # private dirs? (og-r)
-
-
-# enable fancy git prompt if possible
-if [ "$(type -t __git_ps1)" == "function" ]; then
-    gitsection="\[$RED\]\$(__git_ps1 '(%s)')"
+if [ -f ~/.bash_prompt ]; then
+    . ~/.bash_prompt
 else
-    gitsection=""
+    # basic prompt fallback if we can't find the prompt script
+    PS1='${prefix}\u@\h:\w\$ '
 fi
 
-# prints a "friendly" version of $PWD where a $HOME prefix is collapsed to ~
-function friendlypwd() {
-    # add trailing slash to pwd
-    local here=$(pwd)/
-    # substitute ~/ for $HOME/ 
-    local friendly=${here/$HOME\//\~\/}
-    # remove the trailing slash before emitting
-    friendly=${friendly/%\/}
-    echo $friendly
-}
-
-# TODO: refactor prompt logic into another file
-        # but with a sensible fallback if that file is not found
-# TODO: this logic for each individual dir along the path
-function pathcolorize() {
-    # default color
-    local dircolor=$BOLD$BLUE
-    local here=$(pwd)
-    local perms=$(stat --format=%a $here)
-    if [[ -h $here ]]; then
-        # dir is a symlink
-        dircolor=$BOLD$CYAN
-    elif [[ "$perms" -eq 700 ]]; then
-        # private-only dir
-        dircolor=$MAGENTA
-    elif [[ "$perms" -eq 777 ]]; then
-        # world-writable dir
-        dircolor=$YELLOW
-    elif [[ ! -w "$here" ]]; then
-        # dir not writable for me
-        dircolor=$PLAIN
-    fi
-    # any other cases?  non-owned dir?  group-writable dir?
-    # dir that i can't write to?
-    # TODO: figure out how to get \[ and \] into this properly
-    # it seems they are treated literally in $PS1 when they come from variable
-    # substitution.  might have to go into a fully $PROMPT_COMMAND computed prompt.
-    # echo "\[$dircolor\]$friendly\[$PLAIN\]";
-    echo "$dircolor$(friendlypwd)$PLAIN";
-}
-
-dirsection='`pathcolorize`'
-# \[ and \] tell bash that the enclosed characters are non-printing,
-# so it can calculate screen usage; see http://mywiki.wooledge.org/BashFAQ/053
-prefix=${debian_chroot:+($debian_chroot)}
-# PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:\[$curdircolor\]\w${gitsection}\[$PLAIN$RESET\]$terminator "
-# PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:${dirsection}${gitsection}\[$PLAIN$RESET\]$terminator "
-PS1="$prefix\[$usercolor\]\u\[$RESET$PLAIN$YELLOW\]@\[$hostcolor\]\h\[$PLAIN\]:${dirsection}${gitsection}\[$PLAIN$RESET\]$terminator "
-
-# extra git info
-GIT_PS1_SHOWDIRTYSTATE=1 #... untagged(*) and staged(+) changes
-GIT_PS1_SHOWSTASHSTATE=1 #... if something is stashed($)
-GIT_PS1_SHOWUNTRACKEDFILES=1 #... untracked files(%)
-
-# non-color fallback for unknown terminals
-# TODO: find more reliable method of detecting color capability.
-case "$TERM" in
-    xterm-color|xterm-256color|xterm|cygwin|linux|screen) ;;
-    *) PS1='${prefix}\u@\h:\w\$ ' ;;
-esac
-
-# too many aliases to keep here, now we just source another file
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi

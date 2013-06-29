@@ -1,0 +1,171 @@
+#!/bin/bash
+
+# build a fancy bash prompt with dynamic color
+
+# toggle debug output
+#trace() { echo "$@" 1>&2; }
+trace() { echo -n; }
+
+# ansi styling
+# now following the advice of http://mywiki.wooledge.org/BashFAQ/037
+# with some help from http://wiki.bash-hackers.org/scripting/terminalcodes
+RESET=$(tput sgr0)
+BOLD=$(tput bold)
+NOBOLD=$(tput rmso)
+
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+PLAIN=$(tput setaf 9)
+
+
+# prints a "friendly" version of a path where a $HOME prefix is collapsed to ~
+function friendlypath() {
+    # add trailing slash to pwd
+    local here=$1/
+    # substitute ~/ for $HOME/ 
+    local friendly=${here/$HOME\//\~\/}
+    # remove the trailing slash before emitting
+    friendly=${friendly/%\/}
+    echo $friendly
+}
+
+# decide what color a path should be based on some attributes about it
+function color_for_path() {
+    trace "dircolor sees '$1'"
+    # default color
+    local dircolor=$BOLD$BLUE
+    local here="$1"
+    local perms=$(stat --format=%a "$here")
+    if [[ -L $here ]]; then
+        # dir is a symlink
+        dircolor=$BOLD$CYAN
+    elif [[ "$perms" -eq 700 ]]; then
+        # private-only dir
+        dircolor=$MAGENTA
+    elif [[ "$perms" -eq 777 ]]; then
+        # world-writable dir
+        dircolor=$YELLOW
+    elif [[ ! -w "$here" ]]; then
+        # dir not writable for me
+        dircolor=$RESET
+    fi
+    # any other cases?  non-owned dir?  group-writable dir?
+    # dir that i can't write to?
+    echo "$dircolor"
+}
+
+
+# echos a path with each segment individually colorized
+# also inserts \[ \] sequences, for use in $PS1
+function colorize_path_segments() {
+    trace "dollar 1 is '$1'"
+    local path="$(friendlypath "$1")"
+    trace "friendly path is '$path'"
+    IFS='/' read -ra segs <<< "$path"
+
+    local accum=""
+    local output=""
+
+    for seg in "${segs[@]}"; do
+        trace "going to colorize '$seg'"
+        if [[ $seg == '~' ]]; then
+            accum=$HOME
+        else
+            accum="$accum/$seg"
+        fi
+        local col=$(color_for_path "$accum")
+        output="\[$RESET\]$output\[$RESET$col\]$seg\[$BOLD$BLUE\]/"
+    done
+
+    # remove trailing slash
+    output=${output/%\/}
+    echo "$output\[$RESET\]"
+}
+
+
+
+######################################################################
+# Initialize a series of variables, related to prompt config
+# these are static for the life of a shell
+case "$USER" in
+    nathan|nstien|npstien|Nathan|"Nathan Stien") 
+        usercolor=$GREEN
+        terminator=∫
+        ;;
+    root|Administrator) 
+        usercolor=$BOLD$RED;
+        terminator='#'
+        ;;
+    *)
+        usercolor=$BOLD$YELLOW
+        terminator='$'
+        ;;
+esac
+
+case "$HOSTNAME" in 
+    hugin)          hostcolor=${BLUE} ;;
+    wintermute)     hostcolor=$BOLD$WHITE;;
+    dev1)           hostcolor=$BOLD$CYAN ;;
+    munin)          hostcolor=$RED ;;
+    xathan)         hostcolor=$MAGENTA ;;
+    dathan)         hostcolor=${BOLD}${YELLOW} ;;
+    hapax)          hostcolor=${BOLD}${WHITE} ;;
+    gir)            ;;
+    prod-app01.bits.illinoisstate.edu)   hostcolor=$BOLD$CYAN ;;
+    prod-app02.bits.illinoisstate.edu)   hostcolor=$BOLD$CYAN ;;
+    *)              hostcolor=$GREEN ;;
+esac
+
+# enable fancy git prompt if possible
+# TODO: deal with distros that don't have this already sourced?
+if [ "$(type -t __git_ps1)" == "function" ]; then
+    # enable extra git info
+    GIT_PS1_SHOWDIRTYSTATE=1        #... untagged(*) and staged(+) changes
+    GIT_PS1_SHOWSTASHSTATE=1        #... stashed($) changes
+    GIT_PS1_SHOWUNTRACKEDFILES=1    #... untracked files(%)
+    gitsection="\[$BOLD$RED\]\$(__git_ps1 '(%s)')"
+else
+    gitsection=""
+fi
+
+
+# identify chroot if we're in one, to prefix the prompt below
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+function build_prompt() {
+    local p="${debian_chroot:+($debian_chroot)}"
+    p="$p\[$usercolor\]\u"
+    p="$p\[$RESET$YELLOW\]@"
+    p="$p\[$hostcolor\]\h"
+    p="$p\[$PLAIN\]:"
+    p=$p$(colorize_path_segments "`pwd`")
+    p="$p$gitsection"
+    p="$p\[$RESET\]$terminator "
+
+    echo "$p"
+}
+
+case "$TERM" in
+    # support non-color fallback for unknown terminals
+    # TODO: find more reliable method of detecting color capability
+    xterm-color|xterm-256color|xterm|cygwin|linux|screen) 
+        export PROMPT_COMMAND='PS1="$(build_prompt)"'
+        ;;
+    *) 
+        PS1='${prefix}\u@\h:\w\$ '
+        ;;
+esac
+
+# right now this thing creates a lot of variables it just leaves around
+# might consider refactoring for better scoping
+# or just a bunch of unset calls
+# but for now... m'eh
+
