@@ -1,13 +1,10 @@
-#!/bin/bash
-
 # build a fancy bash prompt with dynamic color
 
-# toggle debug output
+# debug helper
 #trace() { echo "$@" 1>&2; }
-trace() { echo -n; }
 
 # ansi styling
-# now following the advice of http://mywiki.wooledge.org/BashFAQ/037
+# following the advice of http://mywiki.wooledge.org/BashFAQ/037
 # with some help from http://wiki.bash-hackers.org/scripting/terminalcodes
 RESET=$(tput sgr0)
 BOLD=$(tput bold)
@@ -24,9 +21,9 @@ WHITE=$(tput setaf 7)
 PLAIN=$(tput setaf 9)
 
 
-# prints a "friendly" version of a path where a $HOME prefix is collapsed to ~
-function friendlypath() {
-    # add trailing slash to pwd
+# /home/username/foo -> ~/foo
+function unexpand_home_tilde() {
+    # add trailing slash to distinguish from /home/usernameOFSOMEONEELSE
     local here=$1/
     # substitute ~/ for $HOME/ 
     local friendly=${here/$HOME\//\~\/}
@@ -36,8 +33,8 @@ function friendlypath() {
 }
 
 # decide what color a path should be based on some attributes about it
+# echos an ANSI sequence
 function color_for_path() {
-    trace "dircolor sees '$1'"
     # default color
     local dircolor=$BOLD$BLUE
     local here="$1"
@@ -55,8 +52,7 @@ function color_for_path() {
         # dir not writable for me
         dircolor=$RESET
     fi
-    # any other cases?  non-owned dir?  group-writable dir?
-    # dir that i can't write to?
+    # TODO any other cases?  non-owned dir?  group-writable dir?
     echo "$dircolor"
 }
 
@@ -64,16 +60,13 @@ function color_for_path() {
 # echos a path with each segment individually colorized
 # also inserts \[ \] sequences, for use in $PS1
 function colorize_path_segments() {
-    trace "dollar 1 is '$1'"
-    local path="$(friendlypath "$1")"
-    trace "friendly path is '$path'"
+    local path="$(unexpand_home_tilde "$1")"
     IFS='/' read -ra segs <<< "$path"
 
     local accum=""
     local output=""
 
     for seg in "${segs[@]}"; do
-        trace "going to colorize '$seg'"
         if [[ $seg == '~' ]]; then
             accum=$HOME
         else
@@ -164,8 +157,6 @@ case "$TERM" in
         ;;
 esac
 
+# TODO consider refactoring for more sanitary scoping
 # right now this thing creates a lot of variables it just leaves around
-# might consider refactoring for better scoping
-# or just a bunch of unset calls
-# but for now... m'eh
 
