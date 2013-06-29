@@ -28,9 +28,11 @@ alias cdgr='cd $(git rev-parse --show-toplevel)'
 alias updatebashrc='exec bash --login'
 
 # useful for piping things in and out of
-# e.g.:   grep foo * | clipput
-alias clipget='xclip -selection clipboard -out'
-alias clipput='xclip -selection clipboard'
+# e.g.:   grep foo * | clipcopy
+# alias clipget='xclip -selection clipboard -out'
+# alias clipput='xclip -selection clipboard'
+alias clippaste='xclip -selection clipboard -out'
+alias clipcopy='xclip -selection clipboard'
 
 alias dap='dcop amarok player'
 alias amadd='dcop amarok playlist addMedia'
