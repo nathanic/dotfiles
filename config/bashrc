@@ -92,7 +92,13 @@ shopt -s globstar
 #[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
 [ -x $HOME/bin/lesspipe.sh ] && eval "$($HOME/bin/lesspipe.sh)"
 export LESS_ADVANCED_PREPROCESSOR=yes
-# TODO: vimpager if possible
+
+# but prefer vimpager if available
+if [[ -x $HOME/bin/vimpager ]]; then
+    export PAGER=$HOME/bin/vimpager
+    alias less=$PAGER
+    alias zless=$PAGER
+fi
 
 if [ -f ~/.bash_prompt ]; then
     . ~/.bash_prompt

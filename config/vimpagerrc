@@ -1,0 +1,10 @@
+" vi:ft=vim
+
+set t_Co=256
+if $TERM == "screen"
+    " koehler always looks good in a basic terminal 
+    colorscheme koehler
+else
+    " jellybeans is great in gvim or 256 color terminal
+    colorscheme jellybeans
+end
