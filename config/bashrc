@@ -165,33 +165,45 @@ else
     gitsection=""
 fi
 
+# prints a "friendly" version of $PWD where a $HOME prefix is collapsed to ~
+function friendlypwd() {
+    # add trailing slash to pwd
+    local here=$(pwd)/
+    # substitute ~/ for $HOME/ 
+    local friendly=${here/$HOME\//\~\/}
+    # remove the trailing slash before emitting
+    friendly=${friendly/%\/}
+    echo $friendly
+}
+
 # TODO: refactor prompt logic into another file
         # but with a sensible fallback if that file is not found
 # TODO: this logic for each individual dir along the path
 function pathcolorize() {
     # default color
-    local dircolor=$BOLD$BLUE;
-    local here=$(pwd)/;
-    local perms=$(stat --format=%a $here);
-    # TODO: refactor friendly pwd business to another fn?
-    local friendly=${here/$HOME\//\~\/}
-    friendly=${friendly/%\/}
-    if [[ -h $(pwd) ]]; then
+    local dircolor=$BOLD$BLUE
+    local here=$(pwd)
+    local perms=$(stat --format=%a $here)
+    if [[ -h $here ]]; then
         # dir is a symlink
-        dircolor=$BOLD$CYAN;
+        dircolor=$BOLD$CYAN
     elif [[ "$perms" -eq 700 ]]; then
         # private-only dir
-        dircolor=$RED;
+        dircolor=$MAGENTA
     elif [[ "$perms" -eq 777 ]]; then
         # world-writable dir
-        dircolor=$YELLOW;
+        dircolor=$YELLOW
+    elif [[ ! -w "$here" ]]; then
+        # dir not writable for me
+        dircolor=$PLAIN
     fi
     # any other cases?  non-owned dir?  group-writable dir?
+    # dir that i can't write to?
     # TODO: figure out how to get \[ and \] into this properly
     # it seems they are treated literally in $PS1 when they come from variable
-    # substitution.
+    # substitution.  might have to go into a fully $PROMPT_COMMAND computed prompt.
     # echo "\[$dircolor\]$friendly\[$PLAIN\]";
-    echo "$dircolor$friendly$PLAIN";
+    echo "$dircolor$(friendlypwd)$PLAIN";
 }
 
 dirsection='`pathcolorize`'
