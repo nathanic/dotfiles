@@ -1,4 +1,9 @@
-" Nathan's vimrc
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Nathan's vimrc -- There are many like it, but this one is mine.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plugin management with Vundle
 set nocompatible               " be iMproved
 filetype off                   " required for vundle stuff
 
@@ -50,10 +55,14 @@ Bundle 'tpope/vim-fireplace'
 Bundle 'guns/vim-clojure-static'
 " Bundle 'tpope/vim-classpath'
 Bundle 'paredit.vim'
+Bundle 'kien/rainbow_parentheses.vim'
 
 """" misc language interaction
+" supercollider repl integration
 Bundle 'sbl/scvim'
+" good syntax checker
 Bundle 'scrooloose/syntastic'
+" generic repl integration
 Bundle 'jpalardy/vim-slime'
 "Bundle 'Superior-Haskell-Interaction-Mode-SHIM'
 
@@ -140,8 +149,8 @@ nnoremap <silent> j gj
 nnoremap <silent> k gk
 
 " redraw window so search terms are centered
-nnoremap n nzz
-nnoremap N Nzz
+" nnoremap n nzz
+" nnoremap N Nzz
 
 " python, haskell, and softtabstop have made me a spaces man
 set autoindent
@@ -255,6 +264,7 @@ endif " has("autocmd")
 "         \ | wincmd p | diffthis
 
 " improved DiffOrig from acx0
+" TODO: break this out into its own plugin
 nnoremap <Leader>do :call DiffOrig()<cr>
 command! DiffOrig :call DiffOrig()
 function! DiffOrig()
@@ -386,8 +396,11 @@ nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 " emergency stop for overtone synthesizer
 nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
 
+" support :W for :w -- I fat-finger this all the time
+command! W w 
+
 " write to root-owned file when running as non-root
-command! W write !sudo tee % > /dev/null
+command! Wsudo write !sudo tee % > /dev/null
 
 " quickly make a file into a vim-outliner file:
     " set filetype,
@@ -489,6 +502,7 @@ nnoremap <silent> <Leader>o
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " prose writing (ganked from acx0)
+" TODO: break this out into its own plugin
 " modes:
 " notes - hard wrap at 78 characters, don't reformat text after changes
 " email - hard wrap at 78 characters, reformat text after changes
@@ -515,7 +529,7 @@ function! SetProse(mode)
 
     setlocal nonumber
     setlocal wrap
-    setlocal spell
+    " setlocal spell
 
     if a:mode == "notes"
         setlocal textwidth=78
@@ -544,3 +558,9 @@ function! SetProse(mode)
     echo a:mode == "off" ? "noprose" : " prose (" . a:mode . ")"
 endfunction
 
+
+
+" TODO: harvest more good ideas from these
+" http://stackoverflow.com/questions/164847/what-is-in-your-vimrc
+" http://nvie.com/posts/how-i-boosted-my-vim/
+" http://stevelosh.com/blog/2010/09/coming-home-to-vim/
