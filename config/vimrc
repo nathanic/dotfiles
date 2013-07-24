@@ -43,6 +43,7 @@ Bundle 'kchmck/vim-coffee-script'
 Bundle 'vim-pandoc/vim-pandoc'
 Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'puppetlabs/puppet-syntax-vim'
+"Bundle 'xml.vim'
 
 """" outlining tools
 Bundle 'vimoutliner/vimoutliner'
