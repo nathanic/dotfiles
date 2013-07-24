@@ -6,5 +6,6 @@ if $TERM == "screen"
     colorscheme koehler
 else
     " jellybeans is great in gvim or 256 color terminal
+    set rtp+=~/.vim/bundle/jellybeans.vim/
     colorscheme jellybeans
 end
