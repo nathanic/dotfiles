@@ -1,4 +1,6 @@
+#!/bin/bash
 # build a fancy bash prompt with dynamic color
+# (the shebang is only there to get vim to use bash syntax highlighting)
 
 # debug helper
 #trace() { echo "$@" 1>&2; }
@@ -6,6 +8,7 @@
 # ansi styling
 # following the advice of http://mywiki.wooledge.org/BashFAQ/037
 # with some help from http://wiki.bash-hackers.org/scripting/terminalcodes
+# todo maybe define more colors like http://mediadoneright.com/content/ultimate-git-ps1-bash-prompt
 RESET=$(tput sgr0)
 BOLD=$(tput bold)
 NOBOLD=$(tput rmso)
@@ -53,6 +56,7 @@ function color_for_path() {
         dircolor=$RESET
     fi
     # TODO any other cases?  non-owned dir?  group-writable dir?
+    # sticky bits?  (stat returns 1777 for /tmp)
     echo "$dircolor"
 }
 
@@ -122,6 +126,8 @@ if [ "$(type -t __git_ps1)" == "function" ]; then
     GIT_PS1_SHOWDIRTYSTATE=1        #... untagged(*) and staged(+) changes
     GIT_PS1_SHOWSTASHSTATE=1        #... stashed($) changes
     GIT_PS1_SHOWUNTRACKEDFILES=1    #... untracked files(%)
+    GIT_PS1_SHOWUPSTREAM=1          # trying this out too
+    GIT_PS1_SHOWCOLORHINTS=1        # not sure what this does
     gitsection="\[$BOLD$RED\]\$(__git_ps1 '(%s)')"
 else
     gitsection=""
@@ -138,7 +144,7 @@ function build_prompt() {
     p="$p\[$usercolor\]\u"
     p="$p\[$RESET$YELLOW\]@"
     p="$p\[$hostcolor\]\h"
-    p="$p\[$PLAIN\]:"
+    p="$p\[$RESET\]:"
     p=$p$(colorize_path_segments "`pwd`")
     p="$p$gitsection"
     p="$p\[$RESET\]$terminator "
@@ -158,5 +164,7 @@ case "$TERM" in
 esac
 
 # TODO consider refactoring for more sanitary scoping
-# right now this thing creates a lot of variables it just leaves around
+# right now this thing creates a lot of variables it just leaves around.
+# either recalculate every time and use function-local variables,
+# or perhaps prefix all the variables with something unlikely to collide.
 
