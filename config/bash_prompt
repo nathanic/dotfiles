@@ -155,7 +155,7 @@ function build_prompt() {
 case "$TERM" in
     # support non-color fallback for unknown terminals
     # TODO: find more reliable method of detecting color capability
-    xterm-color|xterm-256color|xterm|cygwin|linux|screen) 
+    konsole|konsole-256color|xterm-color|xterm-256color|xterm|cygwin|linux|screen|screen-256color) 
         export PROMPT_COMMAND='PS1="$(build_prompt)"'
         ;;
     *) 
