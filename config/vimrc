@@ -69,7 +69,10 @@ Bundle 'jpalardy/vim-slime'
 
 """" git support
 Bundle 'tpope/vim-fugitive'
-Bundle 'airblade/vim-gitgutter'
+" i'm very sad to have to disable this one
+" but it was breaking my gvim's ability to yank to the clipboard
+" TODO: try one of the alternatives mentioned in vim-gitgutter's README
+" Bundle 'airblade/vim-gitgutter'
 
 """" misc tool interaction
 Bundle 'mileszs/ack.vim'
@@ -136,7 +139,7 @@ endif
 set clipboard=unnamed
 " directly use clipboard register when supported (X11 only)
 if has("unnamedplus")
-    set clipboard+=unnamedplus
+    " set clipboard+=unnamedplus
 endif
 
 set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·
