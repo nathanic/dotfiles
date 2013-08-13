@@ -71,12 +71,14 @@ alias verynice='ionice -c3 nice'
 # can resume partial transfers, but requires remote rsync
 # note that -a means preserve attribs and do not follow symlinks
 # add --bwlimit=N to limit to N kbyte/sec
-alias rcopy='rsync -a --rsh=ssh --partial --progress'
-alias lancopy='rsync --bwlimit=1000 -a --rsh=ssh --partial --progress'
-alias slowcopy='rsync --bwlimit=100 -a --rsh=ssh --partial --progress'
+alias rcopy='rsync -ar --partial --progress'
+alias slowcopy='rsync --bwlimit=1000 -a --rsh=ssh --partial --progress'
 
-# ill-advised but handy sometimes
-alias killswanks="psgrep swank | awk '{print $2}' | xargs kill"
+# http://blog.sanctum.geek.nz/watching-with-tmux/
+function tmw {
+    tmux split-window -dh "$*"
+}
+
 
 # functional style "apply cmd arg0 [arg1 [...]]"
 # -> cmd arg0; cmd arg1; ...
@@ -212,4 +214,5 @@ j() {
 complete -C 'j --complete "$COMP_LINE"' j
 # prepend to PROMPT_COMMAND
 PROMPT_COMMAND='j --add "$(pwd -P)";'"$PROMPT_COMMAND"
+
 
