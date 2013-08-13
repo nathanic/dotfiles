@@ -128,9 +128,22 @@ if [ -x "$(which keychain 2> /dev/null)" ]; then
     . ~/.keychain/${HOSTNAME}-sh
 fi
 
-# automatically invoke screen if we're not in a session already
-if [ -x `which screen` ] && [ "$TERM" != "screen" ] && [ "$DISPLAY" != ":0" ] && [ "$DISPLAY" != ":0.0" ]; then
-    # -xRR will attach without detaching other sessions
-    screen -xRR
+
+
+
+
+# automatically invoke a terminal multiplexer if we're not in a session already
+function find_multiplexer_cmd() {
+    if [ -x "$(which tmux)" ]; then
+        echo "tmux attach"
+    elif [ -x "$(which screen)" ]; then
+        echo "screen -xRR"
+    fi
+}
+
+if [[ -z "$TMUX" ]] && [[ "$TERM" != screen* ]] && [[ -z "$DISPLAY" ]]; then
+    mux=$(find_multiplexer_cmd)
+    [ -n "$mux" ] && eval $mux
 fi
+
 
