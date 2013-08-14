@@ -130,20 +130,15 @@ fi
 
 
 
-
-
 # automatically invoke a terminal multiplexer if we're not in a session already
-function find_multiplexer_cmd() {
-    if [ -x "$(which tmux)" ]; then
-        echo "tmux attach"
-    elif [ -x "$(which screen)" ]; then
-        echo "screen -xRR"
-    fi
-}
-
 if [[ -z "$TMUX" ]] && [[ "$TERM" != screen* ]] && [[ -z "$DISPLAY" ]]; then
-    mux=$(find_multiplexer_cmd)
-    [ -n "$mux" ] && eval $mux
+    if [ -x "$(which tmux)" ]; then
+        tmux attach
+    elif [ -x "$(which screen)" ]; then
+        screen -xRR
+    else
+        echo "WARNING: no terminal multiplexer could be found, so you're on your own"
+    fi
 fi
 
 
