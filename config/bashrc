@@ -133,7 +133,7 @@ fi
 # automatically invoke a terminal multiplexer if we're not in a session already
 if [[ -z "$TMUX" ]] && [[ "$TERM" != screen* ]] && [[ -z "$DISPLAY" ]]; then
     if [ -x "$(which tmux)" ]; then
-        tmux attach
+        tmux attach || tmux new -s sys
     elif [ -x "$(which screen)" ]; then
         screen -xRR
     else
