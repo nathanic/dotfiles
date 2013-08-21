@@ -388,8 +388,8 @@ endfunction
 
 " filter through xml tidy (must be available on path)
 " select xml text in visual mode to use
-vnoremap ,x :!tidy -q -i --indent-spaces 4 -xml<CR>
-nnoremap ,x :%!tidy -q -i --indent-spaces 4 -xml<CR>
+vnoremap ,x :!tidy -q -i --indent-spaces 4 -wrap 0 -xml<CR>
+nnoremap ,x :%!tidy -q -i --indent-spaces 4 -wrap 0 -xml<CR>
 
 " alternatively
 "nnoremap ,X silent %!xmllint --encode UTF-8 --format -
