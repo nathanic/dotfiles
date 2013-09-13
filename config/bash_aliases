@@ -74,6 +74,9 @@ alias verynice='ionice -c3 nice'
 alias rcopy='rsync -ar --partial --progress'
 alias slowcopy='rsync --bwlimit=1000 -a --rsh=ssh --partial --progress'
 
+# incredibly simple single-file webserver
+jankserve() { while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; cat "$1"; } | nc -l 8080; done }
+
 # http://blog.sanctum.geek.nz/watching-with-tmux/
 function tmw {
     tmux split-window -dh "$*"
