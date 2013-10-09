@@ -54,7 +54,7 @@ Bundle 'VOoM'
 Bundle 'insanum/votl'
 
 """" clojure stuff
-"Bundle 'kien/rainbow_parentheses.vim'
+"http://clojure-doc.org/articles/tutorials/vim_fireplace.html
 Bundle 'tpope/vim-fireplace'
 Bundle 'guns/vim-clojure-static'
 " Bundle 'tpope/vim-classpath'
@@ -84,18 +84,19 @@ Bundle 'mileszs/ack.vim'
 Bundle 'gnupg.vim'
 
 """" color schemes
-Bundle 'junegunn/seoul256.vim'
-Bundle 'ciaranm/inkpot'
-Bundle 'tomasr/molokai'
+" (commenting out the ones i'm not using at the moment to simplify the rtp)
+" Bundle 'junegunn/seoul256.vim'
+" Bundle 'ciaranm/inkpot'
+" Bundle 'tomasr/molokai'
 Bundle 'nanotech/jellybeans.vim'
 Bundle 'altercation/vim-colors-solarized'
-Bundle 'sjl/badwolf'
-Bundle 'Lokaltog/vim-distinguished'
-Bundle 'jnurmine/Zenburn'
+" Bundle 'sjl/badwolf'
+" Bundle 'Lokaltog/vim-distinguished'
+" Bundle 'jnurmine/Zenburn'
 Bundle 'vilight.vim'
 "Bundle 'tpope/vim-vividchalk'
-Bundle 'andyferra/vim-vividchalk'
-
+" Bundle 'andyferra/vim-vividchalk'
+" TODO: switch to https://github.com/flazz/vim-colorschemes
 
 filetype plugin indent on
 " vundle time is over, back to regularly-scheduled vim config
@@ -140,11 +141,12 @@ if v:version > 703 || (v:version == 703 && has("patch72"))
     set wildignorecase
 endif
 
-" use gui clipboard if possible
-set clipboard=unnamed
-" directly use clipboard register when supported (X11 only)
+" use gui clipboard if available
 if has("unnamedplus")
+    " directly use clipboard register when supported (X11 only)
     " set clipboard+=unnamedplus
+else
+    set clipboard+=unnamed
 endif
 
 set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·
@@ -180,12 +182,11 @@ if &t_Co > 2 || has("gui_running")
     syntax on          " enable syntax highlighting
 endif
 
-" if has("gui_running")
-"     " only looks good in the GUI (if even that)
-"     set cursorline          " highlight the current line
-"     set cursorcolumn
-" endif
-
+if &t_Co > 16 || has("gui_running")
+    " only looks good if we have enough colors
+    set cursorline
+    set cursorcolumn
+endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -220,6 +221,11 @@ let g:paredit_electric_return=1
 " for vim-slime
 let g:slime_target = "tmux"
 
+" TODO might want to just target lispy langs with this
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Auto Commands
@@ -263,6 +269,12 @@ if has("autocmd")
         autocmd Syntax * call matchadd('Todo',  '\(^\|\W\zs\)\(TODO\|FIXME\|CHANGED\|XXX\|BUG\|HACK\)\(:\|\)')
         autocmd Syntax * call matchadd('Debug', '\(^\|\W\zs\)\(NOTE\|INFO\|IDEA\)\(:\|\)')
     endif
+
+
+    augroup cursorlines
+        autocmd WinEnter * setlocal cursorline | setlocal cursorcolumn
+        autocmd WinLeave * setlocal nocursorline | setlocal nocursorcolumn
+    augroup end
 
 endif " has("autocmd")
 
@@ -403,7 +415,8 @@ nnoremap ,x :%!tidy -q -i --indent-spaces 4 -wrap 0 -xml<CR>
 nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 
 " emergency stop for overtone synthesizer
-nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
+" nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
+nnoremap <f12> :Eval (stop)<cr>
 
 " support :W for :w -- I fat-finger this all the time
 command! W w 
@@ -573,3 +586,25 @@ endfunction
 " http://stackoverflow.com/questions/164847/what-is-in-your-vimrc
 " http://nvie.com/posts/how-i-boosted-my-vim/
 " http://stevelosh.com/blog/2010/09/coming-home-to-vim/
+
+" " this doesn't seem to work well..
+" function! MyVotlColors()
+"     highlight OL1 ctermfg=lightblue
+"     highlight OL2 ctermfg=red
+"     highlight OL3 ctermfg=brown
+"     highlight OL4 ctermfg=yellow
+"     highlight OL5 ctermfg=lightblue
+"     highlight OL6 ctermfg=red
+"     highlight OL7 ctermfg=brown
+"     highlight OL8 ctermfg=yellow
+"     highlight OL8 ctermfg=white
+" 
+"     " color for body text
+"     for i in range(1, 9)
+"         execute "highlight BT" . i . " ctermfg=lightgreen"
+"     endfor
+" 
+"     " ...etc...
+" endfunction
+" autocmd FileType votl call MyVotlColors()
+" 
