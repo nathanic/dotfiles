@@ -109,7 +109,8 @@ case "$HOSTNAME" in
     hugin)          hostcolor=${BLUE} ;;
     wintermute)     hostcolor=$BOLD$WHITE;;
     dev1)           hostcolor=$BOLD$CYAN ;;
-    munin)          hostcolor=$RED ;;
+    # munin)          hostcolor=$RED ;;
+    munin)          hostcolor=$BOLD$WHITE ;;
     xathan)         hostcolor=$MAGENTA ;;
     dathan)         hostcolor=${BOLD}${YELLOW} ;;
     hapax)          hostcolor=${BOLD}${WHITE} ;;
