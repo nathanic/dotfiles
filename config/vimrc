@@ -59,6 +59,8 @@ Bundle 'paredit.vim'
 Bundle 'kien/rainbow_parentheses.vim'
 
 """" misc language interaction
+" rust support
+Bundle 'wting/rust.vim'
 " supercollider repl integration
 Bundle 'sbl/scvim'
 " good syntax checker
