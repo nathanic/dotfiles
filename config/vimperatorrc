@@ -15,6 +15,9 @@ nmap <C-8> :8tn<Return>
 nmap <C-9> :9tn<Return>
 nmap <C-0> :tablast<Return>
 
+nmap , :tp<cr>
+nmap . :tn<cr>
+
 ignorekeys add pinboard\\.in/add
 ignorekeys add owa\\.illinoisstate\\.edu
 ignorekeys add mail\\.google\\.com
