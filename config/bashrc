@@ -33,6 +33,12 @@ case $HOSTNAME in
         export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:$PATH
         #export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
         ;;
+    munin)
+        export PATH=~/local/rust/bin:$PATH
+        export PATH=~/local/jdk-7/bin:~/local/glassfish3/bin:$PATH:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools:~/local/android-studio/bin
+        export JAVA_HOME=~/local/jdk-7
+        export ANDROID_HOME=~/local/android-sdk-linux
+        ;;
 esac
 
 [ -d ~/.cabal/ ] && export PATH=~/.cabal/bin:$PATH
