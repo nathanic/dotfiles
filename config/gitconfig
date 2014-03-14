@@ -1,6 +1,6 @@
 [user]
 	name = Nathan Stien
-    email = nathanism@gmail.com
+    email = npstien@ilstu.edu
 [color]
 	diff = auto
 	status = auto
@@ -8,6 +8,7 @@
 [alias]
     # lot of good ideas http://git.wiki.kernel.org/index.php/Aliases
     # also http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
+    # TODO: assimilate technological distinctiveness from http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
     # briefer status output
     st = status -sb
     # run 'git rm' on files already deleted outside of git
