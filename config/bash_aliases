@@ -80,6 +80,10 @@ alias slowcopy='rsync --bwlimit=1000 -a --rsh=ssh --partial --progress'
 # incredibly simple single-file webserver
 jankserve() { while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; cat "$1"; } | nc -l 8080; done }
 
+kdeunlock() { 
+    qdbus | grep kscreenlocker_greet | xargs -I {} qdbus {} /MainApplication quit 
+}
+
 # http://blog.sanctum.geek.nz/watching-with-tmux/
 function tmw {
     tmux split-window -dh "$*"
