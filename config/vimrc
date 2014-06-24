@@ -56,6 +56,7 @@ Bundle 'insanum/votl'
 """" clojure stuff
 "http://clojure-doc.org/articles/tutorials/vim_fireplace.html
 Bundle 'tpope/vim-fireplace'
+"TODO: check out vim-redl https://github.com/dgrnbrg/vim-redl
 Bundle 'guns/vim-clojure-static'
 " Bundle 'tpope/vim-classpath'
 Bundle 'paredit.vim'
@@ -64,13 +65,15 @@ Bundle 'kien/rainbow_parentheses.vim'
 """" misc language interaction
 " rust support
 Bundle 'wting/rust.vim'
-" supercollider repl integration
-Bundle 'sbl/scvim'
 " good syntax checker
 Bundle 'scrooloose/syntastic'
 " generic repl integration
 Bundle 'jpalardy/vim-slime'
+" supercollider repl integration
+Bundle 'sbl/scvim'
 "Bundle 'Superior-Haskell-Interaction-Mode-SHIM'
+Bundle 'tclem/vim-arduino'
+" Bundle 'sophacles/vim-processing'
 
 """" git support
 Bundle 'tpope/vim-fugitive'
