@@ -23,6 +23,7 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'tomtom/tcomment_vim'
 Bundle 'Align'
 Bundle 'a.vim'
+Bundle 'gcmt/wildfire.vim'
 " or get tagbar instead?
 Bundle 'taglist.vim'
 Bundle 'scrooloose/nerdtree'
