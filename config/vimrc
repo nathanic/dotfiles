@@ -86,6 +86,9 @@ Bundle 'tpope/vim-fugitive'
 """" misc tool interaction
 Bundle 'mileszs/ack.vim'
 Bundle 'gnupg.vim'
+Bundle 'tpope/vim-tbone'
+" need to do some tmux reconfig for the below to work
+" Bundle 'christoomey/vim-tmux-navigator'
 
 """" color schemes
 " (commenting out the ones i'm not using at the moment to simplify the rtp)
