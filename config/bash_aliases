@@ -32,6 +32,9 @@ alias updatebashrc='exec bash --login'
 alias cpaste='xclip -selection clipboard -out'
 alias ccopy='xclip -selection clipboard'
 
+alias tmux-put='tmux set-buffer \"$(xclip -selection clipboard -o)\"; tmux paste-buffer'
+alias tmux-yank='tmux show-buffer | xclip -i -selection clipboard'
+
 alias dap='dcop amarok player'
 alias amadd='dcop amarok playlist addMedia'
 
@@ -76,6 +79,7 @@ alias verynice='ionice -c3 nice'
 # add --bwlimit=N to limit to N kbyte/sec
 alias rcopy='rsync -ar --partial --progress'
 alias slowcopy='rsync --bwlimit=1000 -a --rsh=ssh --partial --progress'
+
 
 # incredibly simple single-file webserver
 jankserve() { while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; cat "$1"; } | nc -l 8080; done }

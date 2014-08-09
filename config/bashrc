@@ -14,9 +14,10 @@ export CPATH=~/local/include:$CPATH
 
 case $HOSTNAME in
     hugin) 
-        export PATH=~/local/rust/bin:~/local/cargo/bin::~/local/jdk-7/bin:~/local/glassfish3/bin:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools:$PATH
+        export PATH=~/local/rust/bin:~/local/jdk-7/bin:~/local/glassfish3/bin:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools:$PATH
         export JAVA_HOME=~/local/jdk-7
         export ANDROID_HOME=~/local/android-sdk-linux
+        export LD_LIBRARY_PATH=~/local/rust/lib:$LD_LIBRARY_PATH
         ;;
     hapax)
         # export JAVA_HOME=~/local/jdk-6
