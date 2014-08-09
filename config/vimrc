@@ -75,6 +75,8 @@ Bundle 'sbl/scvim'
 "Bundle 'Superior-Haskell-Interaction-Mode-SHIM'
 Bundle 'tclem/vim-arduino'
 " Bundle 'sophacles/vim-processing'
+" alternative haskell thing i'm checking out
+Bundle 'dag/vim2hs'
 
 """" git support
 Bundle 'tpope/vim-fugitive'
@@ -262,7 +264,7 @@ if has("autocmd")
     augroup end "}}}
 
     "http://www.cs.kent.ac.uk/people/staff/cr3/toolbox/haskell/Vim/vim.html
-    au BufEnter *.hs compiler ghc
+    " au BufEnter *.hs compiler ghc
 
     " support MASI::Template files as html
     au BufNewFile,BufReadPost *.thtml setl filetype=html
