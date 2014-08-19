@@ -1,0 +1,25 @@
+#!/bin/bash
+# 2014-05-13 simplified command line interface for gmusicbrowser
+
+readonly prefix="gmusicbrowser -cmd"
+
+eval_command() {
+    case "$1" in
+        up) $($prefix IncVolume)
+            ;;
+        down) $($prefix DecVolume)
+            ;;
+        pause) $($prefix PlayPause)
+            ;;
+        play) $($prefix PlayPause)
+            ;;
+        stop) $($prefix Stop)
+            ;;
+        prev) $($prefix PrevSongInPlaylist)
+            ;;
+        next) $($prefix NextSongInPlaylist) 
+            ;;
+    esac
+}
+
+eval_command "$1"
