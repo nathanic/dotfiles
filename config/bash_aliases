@@ -155,6 +155,10 @@ fk () {
 	unset IFS
 }
 
+# http://www.commandlinefu.com/commands/view/6871/view-all-processess-cmdlines-and-environments
+aa_ps_all () { ( cd /proc && command ps -A -opid= | xargs -I'{}' sh -c 'test $PPID -ne {}&&test -r {}/cmdline&&echo -e "\n[{}]"&&tr -s "\000" " "<{}/cmdline&&echo&&tr -s "\000\033" "\nE"<{}/environ|sort&&cat {}/limits' ); }
+
 # jump-around script  https://github.com/rupa/z
 [[ -f ~/dotfiles/bin/z.sh ]] && source ~/dotfiles/bin/z.sh
+
 
