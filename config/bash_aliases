@@ -161,4 +161,7 @@ aa_ps_all () { ( cd /proc && command ps -A -opid= | xargs -I'{}' sh -c 'test $PP
 # jump-around script  https://github.com/rupa/z
 [[ -f ~/dotfiles/bin/z.sh ]] && source ~/dotfiles/bin/z.sh
 
+ddgip() {
+    lynx -dump https://duckduckgo.com/?q=ip | grep "Your IP address is "
+}
 
