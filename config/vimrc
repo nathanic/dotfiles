@@ -74,6 +74,7 @@ Bundle 'jpalardy/vim-slime'
 Bundle 'sbl/scvim'
 "Bundle 'Superior-Haskell-Interaction-Mode-SHIM'
 Bundle 'tclem/vim-arduino'
+Bundle 'JuliaLang/julia-vim'
 " Bundle 'sophacles/vim-processing'
 " alternative haskell thing i'm checking out
 Bundle 'dag/vim2hs'
