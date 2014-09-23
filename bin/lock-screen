@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo i ran >> $HOME/loggylog
+
+# 2013-12-04 
+# works for kde 4, probably other freedesktop envs
+qdbus org.freedesktop.ScreenSaver /ScreenSaver Lock
+
+
