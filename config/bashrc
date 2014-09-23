@@ -9,47 +9,29 @@ umask 002
 export EDITOR=/usr/bin/vim
 
 # various paths
-# possibly break them out into per-machine local files
 export CPATH=~/local/include:$CPATH
-
-case $HOSTNAME in
-    hugin) 
-        export PATH=~/local/rust/bin:~/local/jdk-7/bin:~/local/glassfish3/bin:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools:$PATH
-        export JAVA_HOME=~/local/jdk-7
-        export ANDROID_HOME=~/local/android-sdk-linux
-        export LD_LIBRARY_PATH=~/local/rust/lib:$LD_LIBRARY_PATH
-        ;;
-    hapax)
-        # export JAVA_HOME=~/local/jdk-6
-        export JAVA_HOME=~/local/jdk-7
-        export ANDROID_HOME=~/local/android-sdk-linux
-        export LD_LIBRARY_PATH=~/local/rust/lib:$LD_LIBRARY_PATH
-        export PATH=~/local/rust/bin:~/local/android-sdk-linux/tools:~/local/jdk-7/bin:~/local/glassfish3/bin:~/local/apache-jmeter/bin:$PATH
-        export PERL_LOCAL_LIB_ROOT="/home/nathan/perl5";
-        export PERL_MB_OPT="--install_base /home/nathan/perl5";
-        export PERL_MM_OPT="INSTALL_BASE=/home/nathan/perl5";
-        export PERL5LIB="/home/nathan/perl5/lib/perl5/x86_64-linux-gnu-thread-multi:/home/nathan/perl5/lib/perl5";
-        export PATH="/home/nathan/perl5/bin:$PATH";
-        ;;
-    wintermute) 
-        export JAVA_HOME=~/local/jdk-6
-        export PATH=~/local/android-sdk-linux/tools:~/local/jdk-6/bin:$PATH
-        #export PATH=~/hs/bin:~/local/arm-elf/bin:$PATH 
-        ;;
-    munin)
-        export PATH=~/local/rust/bin:$PATH
-        export PATH=~/local/jdk-7/bin:~/local/glassfish3/bin:$PATH:~/local/android-sdk-linux/tools:~/local/android-sdk-linux/platform-tools:~/local/android-studio/bin
-        export JAVA_HOME=~/local/jdk-7
-        export ANDROID_HOME=~/local/android-sdk-linux
-        ;;
-esac
-
-[ -d ~/.cabal/ ] && export PATH=~/.cabal/bin:$PATH
-# maybe a function pathadd() to encapsulate the above pattern?
-# pathcons, pathsnoc
-# see https://github.com/jdevera/dotfiles/blob/master/bash.d/010_env_functions.sh
-export PATH=~/bin:~/dotfiles/bin:$PATH:/var/lib/gems/1.8/bin
+export JAVA_HOME=~/local/jdk-7
+export ANDROID_HOME=~/local/android-sdk-linux
 export PYTHONPATH=~/lib/python
+
+cons_path() { 
+    [ -d "$1" ] && export PATH="$1:$PATH" 
+}
+
+cons_path /var/lib/gems/1.8/bin
+cons_path ~/local/perl5/bin
+cons_path ~/local/apache-jmeter/bin
+cons_path ~/local/idea/bin
+cons_path ~/local/glassfish3/bin
+cons_path ~/local/android-studio/bin
+cons_path ~/local/android-sdk-linux/tools
+cons_path ~/local/android-sdk-linux/platform-tools
+cons_path ~/.cabal/
+cons_path ~/local/racket/bin
+cons_path ~/local/rust/bin
+cons_path $JAVA_HOME/bin
+cons_path ~/dotfiles/bin
+cons_path ~/bin
 
 
 ######################################################################
