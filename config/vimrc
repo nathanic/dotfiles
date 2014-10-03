@@ -428,6 +428,9 @@ nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 " nnoremap <f12> :call SlimvEval(["(stop)"])<cr>
 nnoremap <f12> :Eval (stop)<cr>
 
+" pretty-print the last repl result in fireplace.vim
+nnoremap ,p :Eval (clojure.pprint/pp)<cr>
+
 " support :W for :w -- I fat-finger this all the time
 command! W w 
 
