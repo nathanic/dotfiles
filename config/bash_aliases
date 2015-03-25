@@ -18,6 +18,7 @@ alias la='ls -A'
 alias l='ls -CF'
 
 alias d0='export DISPLAY=:0'
+alias d10='export DISPLAY=localhost:10.0'
 
 # 'less' passes ANSI colors
 alias less='less -R'
