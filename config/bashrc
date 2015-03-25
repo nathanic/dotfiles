@@ -14,6 +14,7 @@ export JAVA_HOME=~/local/jdk-7
 export ANDROID_HOME=~/local/android-sdk-linux
 export PYTHONPATH=~/lib/python
 
+# prefix a path onto $PATH if it exists
 cons_path() { 
     [ -d "$1" ] && export PATH="$1:$PATH" 
 }
@@ -26,9 +27,9 @@ cons_path ~/local/glassfish3/bin
 cons_path ~/local/android-studio/bin
 cons_path ~/local/android-sdk-linux/tools
 cons_path ~/local/android-sdk-linux/platform-tools
-cons_path ~/.cabal/
 cons_path ~/local/racket/bin
 cons_path ~/local/rust/bin
+cons_path ~/.cabal/
 cons_path $JAVA_HOME/bin
 cons_path ~/dotfiles/bin
 cons_path ~/bin
@@ -90,6 +91,10 @@ if [[ -x $HOME/bin/vimpager ]]; then
     alias less=$PAGER
     alias zless=$PAGER
 fi
+
+# do partial history search by default with arrow keys
+bind '"\e[A"':history-search-backward
+bind '"\e[B"':history-search-forward
 
 if [ -f ~/.bash_prompt ]; then
     . ~/.bash_prompt
