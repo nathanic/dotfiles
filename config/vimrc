@@ -45,10 +45,11 @@ Bundle 'kchmck/vim-coffee-script'
 Bundle 'vim-pandoc/vim-pandoc'
 Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'puppetlabs/puppet-syntax-vim'
-Bundle 'honza/dockerfile.vim'
+" Bundle 'honza/dockerfile.vim'
 " Bundle 'xml.vim'
 " Bundle 'armyofevilrobots/vim-openscad'
 Bundle 'sirtaj/vim-openscad'
+Bundle 'ekalinin/Dockerfile.vim'
 
 """" outlining tools
 Bundle 'vimoutliner/vimoutliner'
@@ -63,6 +64,7 @@ Bundle 'guns/vim-clojure-static'
 " Bundle 'tpope/vim-classpath'
 Bundle 'paredit.vim'
 Bundle 'kien/rainbow_parentheses.vim'
+Bundle 'typedclojure/vim-typedclojure'
 
 """" misc language interaction
 " rust support
