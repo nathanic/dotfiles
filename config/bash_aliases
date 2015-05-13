@@ -166,3 +166,5 @@ ddgip() {
     lynx -dump https://duckduckgo.com/?q=ip | grep "Your IP address is "
 }
 
+# produce some dazzling colors on the terminal. you'll probably want to run `reset` afterward.
+alias dazzle='while :;do printf "\e[%d;%dH\e[48;5;%dm \e[0m" $(($RANDOM%$LINES)) $(($RANDOM%$COLUMNS)) $(($RANDOM%216 )); done'
