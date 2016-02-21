@@ -1,6 +1,10 @@
 --type-set=perl=.pl,.pm,.pod,.t,.cgi,.mp
 --type-set=cpp=.h,.c,.cpp,.cp
 --type-set=haskell=.hs,.lhs,.chs
+--type-set=cabal=.cabal
 --type-add=html=.thtml,.temail
---type-add=clojure=.cljs
+--type-add=clojure=.cljs,.cljc
+--type-add=rust=.rs
+--type-add=toml=.toml
+--type-add=purescript=.purs
 --ignore-dir=_site
