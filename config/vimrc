@@ -81,6 +81,7 @@ Bundle 'JuliaLang/julia-vim'
 " Bundle 'sophacles/vim-processing'
 " alternative haskell thing i'm checking out
 Bundle 'dag/vim2hs'
+Bundle 'vim-ruby/vim-ruby'
 
 """" git support
 Bundle 'tpope/vim-fugitive'
