@@ -168,3 +168,9 @@ ddgip() {
 
 # produce some dazzling colors on the terminal. you'll probably want to run `reset` afterward.
 alias dazzle='while :;do printf "\e[%d;%dH\e[48;5;%dm \e[0m" $(($RANDOM%$LINES)) $(($RANDOM%$COLUMNS)) $(($RANDOM%216 )); done'
+
+genpasswd() {
+    local l=$1
+    [ "$l" == "" ] && l=16
+    tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs
+}
