@@ -5,8 +5,13 @@
 # play nice with others
 umask 002
 
-# specify the One True Editor
-export EDITOR=/usr/bin/vim
+# we want neovim if we can find it, else vim
+if [[ -f /usr/bin/nvim ]]; then
+    export EDITOR=/usr/bin/nvim
+elif [[ -f /usr/bin/vim ]]; then
+    export EDITOR=/usr/bin/vim
+fi
+# otherwise system default $EDITOR :-/
 
 # various paths
 export CPATH=~/local/include:$CPATH
@@ -29,8 +34,10 @@ cons_path ~/local/android-sdk-linux/tools
 cons_path ~/local/android-sdk-linux/platform-tools
 cons_path ~/local/racket/bin
 cons_path ~/local/rust/bin
-cons_path ~/.cabal/
+cons_path ~/local/node/bin
+cons_path ~/.cabal/bin
 cons_path $JAVA_HOME/bin
+cons_path ~/.local/bin
 cons_path ~/dotfiles/bin
 cons_path ~/bin
 
