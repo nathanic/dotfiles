@@ -180,7 +180,7 @@ vim() {
     if [[ -f $(which nvim) ]]; then
         nvim $*
     else
-        vim $*
+        `which vim` $*
     fi
 }
 
