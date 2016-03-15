@@ -14,8 +14,8 @@
 :set stop :list
 
 -- too many modules for the default prompt.
-:set prompt "ghci> "
-
+-- :set prompt "ghci> "
+:set prompt "λ∫ "
 :set -fno-print-bind-result
 :set -XNoMonomorphismRestriction
 :set -fglasgow-exts
