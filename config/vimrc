@@ -7,6 +7,11 @@
 set nocompatible               " be iMproved
 filetype off                   " required for vundle stuff
 
+" don't complain if there's no ctags
+if !executable('exuberant-ctags') && !executable('ctags')
+    let loaded_taglist = 'no'
+endif
+
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 
