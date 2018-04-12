@@ -17,6 +17,7 @@ alias llh='ls -lh'
 alias la='ls -A'
 alias l='ls -CF'
 
+alias lsblk='lsblk --output NAME,FSTYPE,MOUNTPOINT,LABEL,MODEL,SIZE,STATE,TYPE'
 alias d0='export DISPLAY=:0'
 alias d10='export DISPLAY=localhost:10.0'
 
@@ -187,5 +188,11 @@ vim() {
     else
         `which vim` $*
     fi
+}
+
+authed_keys() {
+    local fn=$1
+    [ "$fn" == "" ] && fn="$HOME/.ssh/authorized_keys"
+    cat "$fn" | xargs -n1 -I% bash -c 'ssh-keygen -l -f /dev/stdin <<<"%"' 
 }
 
