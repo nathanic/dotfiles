@@ -34,6 +34,13 @@ Bundle 'taglist.vim'
 Bundle 'scrooloose/nerdtree'
 Bundle 'tpope/vim-vinegar'
 
+"""" neovim-specific plugins
+if has("nvim")
+    Bundle 'cazador481/fakeclip.neovim'
+    Bundle 'Shougo/deoplete.nvim'
+    Bundle 'eagletmt/neco-ghc'
+endif
+
 " Others I'm considering
 "Bundle 'tpope/abolish'
 "Bundle 'tpope/vim-sleuth'
@@ -71,7 +78,21 @@ Bundle 'paredit.vim'
 Bundle 'kien/rainbow_parentheses.vim'
 Bundle 'typedclojure/vim-typedclojure'
 
+"""" haskelly wabbits
+Bundle 'lukerandall/haskellmode-vim'
+Bundle 'bitc/vim-hdevtools'
+Bundle 'eagletmt/ghcmod-vim'
+Bundle 'eagletmt/neco-ghc'
+" alternative haskell thing i was checking out
+" Bundle 'dag/vim2hs'
+
+"""" purescript!
+Bundle 'raichoo/purescript-vim'
+Bundle 'frigoeu/psc-ide-vim'
+
 """" misc language interaction
+" general async support
+Bundle 'Shougo/vimproc.vim'
 " rust support
 Bundle 'wting/rust.vim'
 " good syntax checker
@@ -84,9 +105,8 @@ Bundle 'sbl/scvim'
 Bundle 'tclem/vim-arduino'
 Bundle 'JuliaLang/julia-vim'
 " Bundle 'sophacles/vim-processing'
-" alternative haskell thing i'm checking out
-Bundle 'dag/vim2hs'
 Bundle 'vim-ruby/vim-ruby'
+Bundle 'lambdatoast/elm.vim'
 
 """" git support
 Bundle 'tpope/vim-fugitive'
@@ -213,7 +233,9 @@ endif
 
 " TODO: check platform, existence of binaries, etc.
 let g:haddock_browser = "firefox"
-let g:haddock_indexfiledir = "~/.vim/"
+" let g:haddock_indexfiledir = "~/.vim/"
+
+
 " huzzah for doxygen
 let g:load_doxygen_syntax=1
 
@@ -245,6 +267,26 @@ au VimEnter * RainbowParenthesesToggle
 au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
+
+let g:rbpt_colorpairs = [
+    \ ['brown',       'RoyalBlue3'],
+    \ ['Darkblue',    'SeaGreen3'],
+    \ ['darkgray',    'DarkOrchid3'],
+    \ ['darkgreen',   'firebrick3'],
+    \ ['darkcyan',    'RoyalBlue3'],
+    \ ['darkred',     'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['brown',       'firebrick3'],
+    \ ['gray',        'RoyalBlue3'],
+    \ ['yellow',      'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['Darkblue',    'firebrick3'],
+    \ ['darkgreen',   'RoyalBlue3'],
+    \ ['darkcyan',    'SeaGreen3'],
+    \ ['darkred',     'DarkOrchid3'],
+    \ ['red',         'firebrick3'],
+    \ ]
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Auto Commands
@@ -294,6 +336,9 @@ if has("autocmd")
         autocmd WinEnter * setlocal cursorline | setlocal cursorcolumn
         autocmd WinLeave * setlocal nocursorline | setlocal nocursorcolumn
     augroup end
+
+    " use ghc-mod to check haskell files on write
+    autocmd BufWritePost *.hs GhcModCheckAndLintAsync
 
 endif " has("autocmd")
 
@@ -352,9 +397,9 @@ let maplocalleader=","
 nnoremap <s-left> :tabprevious<cr>
 nnoremap <s-right> :tabnext<cr>
 
-" f4 and shift-f4 to go forward and backards in errors/greps
+" f4 and f3 to go forward and backards in errors/greps
 nnoremap <f4> :cn<cr>
-nnoremap <s-f4> :cp<cr>
+nnoremap <f3> :cp<cr>
 
 " <c-]> jumps to the tag under the cursor;
 " <c-\> is my analogue for using :ptag
@@ -368,6 +413,10 @@ nnoremap <leader>y "+y
 nnoremap <leader>Y "+yy
 nnoremap <leader>p "+p
 nnoremap <leader>P "+P
+
+" quick access to tmux buffer
+nnoremap <leader>t :Tyank<cr>
+nnoremap <leader>T :Tput<cr>
 
 " select recent pasted text (for indenting etc.)
 nnoremap <leader>v V`]
@@ -431,7 +480,7 @@ nnoremap ,x :%!tidy -q -i --indent-spaces 4 -wrap 0 -xml<CR>
 "nnoremap ,X silent %!xmllint --encode UTF-8 --format -
 
 " dons' haskell typeOf script
-nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
+" nnoremap ty yy:.!typeOf -fbang-patterns -ignore-dot-ghci %
 
 " reload current clojure file into repl (vim-fireplace)
 nnoremap <f10> :w<cr>:Require<cr>
@@ -632,4 +681,6 @@ endfunction
 "     " ...etc...
 " endfunction
 " autocmd FileType votl call MyVotlColors()
-" 
+
+
+" let g:syntastic_haskell_checkers = ['ghc-mod']
