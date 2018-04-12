@@ -4,7 +4,8 @@
 --type-set=cabal=.cabal
 --type-add=html=.thtml,.temail
 --type-add=clojure=.cljs,.cljc
---type-add=rust=.rs
---type-add=toml=.toml
---type-add=purescript=.purs
+--type-set=rust=.rs
+--type-set=toml=.toml
+--type-set=purescript=.purs
+--type-set=elm=.elm
 --ignore-dir=_site
