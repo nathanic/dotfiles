@@ -35,6 +35,7 @@ cons_path ~/local/android-sdk-linux/platform-tools
 cons_path ~/local/racket/bin
 cons_path ~/local/rust/bin
 cons_path ~/local/node/bin
+cons_path ~/local/emacs/bin
 cons_path ~/.cabal/bin
 cons_path $JAVA_HOME/bin
 cons_path ~/.local/bin
@@ -130,7 +131,6 @@ if [ -x "$(which keychain 2> /dev/null)" ]; then
 
     . ~/.keychain/${HOSTNAME}-sh
 fi
-
 
 # automatically invoke a terminal multiplexer if we're not in a session already
 # used to also check [[ -z "$DISPLAY" ]] to prevent it on local xterms
