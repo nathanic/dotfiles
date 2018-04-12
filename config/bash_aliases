@@ -37,8 +37,12 @@ alias ccopy='xclip -selection clipboard'
 alias tmux-put='tmux set-buffer \"$(xclip -selection clipboard -o)\"; tmux paste-buffer'
 alias tmux-yank='tmux show-buffer | xclip -i -selection clipboard'
 
+alias nstat='dstat --net --cpu --top-cpu --disk --top-bio --top-latency --tcp'
+
 alias dap='dcop amarok player'
 alias amadd='dcop amarok playlist addMedia'
+
+alias saguagudu='sudo apt-get update && sudo apt-get -u dist-upgrade'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
