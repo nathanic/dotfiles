@@ -121,7 +121,9 @@ case "$HOSTNAME" in
 esac
 
 # enable fancy git prompt if possible
-# TODO: deal with distros that don't have this already sourced?
+if ! type __git_ps1 &> /dev/null && [ -e /usr/share/git-core/contrib/completion/git-prompt.sh ]; then
+        . /usr/share/git-core/contrib/completion/git-prompt.sh
+fi
 if [ "$(type -t __git_ps1)" == "function" ]; then
     # enable extra git info
     GIT_PS1_SHOWDIRTYSTATE=1        #... untagged(*) and staged(+) changes
