@@ -100,6 +100,7 @@ shopt -s globstar
 #[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
 [ -x $HOME/bin/lesspipe.sh ] && eval "$($HOME/bin/lesspipe.sh)"
 export LESS_ADVANCED_PREPROCESSOR=yes
+export LESS=-R
 
 # but prefer vimpager if available
 if [[ -x $HOME/bin/vimpager ]]; then
