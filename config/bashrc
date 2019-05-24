@@ -6,11 +6,11 @@
 umask 002
 
 # we want neovim if we can find it, else vim
-if [[ -f /usr/bin/nvim ]]; then
-    export EDITOR=/usr/bin/nvim
-elif [[ -f /usr/bin/vim ]]; then
-    export EDITOR=/usr/bin/vim
-fi
+#if [[ -f /usr/bin/nvim ]]; then
+#    export EDITOR=/usr/bin/nvim
+#elif [[ -f /usr/bin/vim ]]; then
+#    export EDITOR=/usr/bin/vim
+#fi
 # otherwise system default $EDITOR :-/
 
 # various paths
