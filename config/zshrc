@@ -70,13 +70,13 @@ plugins=(
     #oc
 )
 
-if [[ -x $(which keychain) ]]; then
+if (($+commands[keychain])); then
     plugins+=(keychain)
 fi
 
 zstyle :omz:plugins:keychain agents ssh
 zstyle :omz:plugins:keychain identities id_rsa 
-zstyle :omz:plugins:keychain options --quiet
+zstyle :omz:plugins:keychain options --quiet --ignore-missing
 
 source $ZSH/oh-my-zsh.sh
 # seems to work?
