@@ -5,6 +5,7 @@ set editing-mode vi
 set completion-ignore-case On
 set bell-style none
 set blink-matching-paren on
+set show-mode-in-prompt on
 
 # vi-mode doesn't have this, for some reason
 C-l: clear-screen
