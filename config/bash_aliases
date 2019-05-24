@@ -15,7 +15,7 @@ alias lh='ls -lh'
 alias lls='ls -lhSr'
 alias llh='ls -lh'
 alias la='ls -A'
-alias l='ls -CF'
+alias l='ls -CFtr'
 
 alias lsblk='lsblk --output NAME,FSTYPE,MOUNTPOINT,LABEL,MODEL,SIZE,STATE,TYPE'
 alias d0='export DISPLAY=:0'
