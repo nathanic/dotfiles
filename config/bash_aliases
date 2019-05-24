@@ -186,13 +186,13 @@ genpasswd() {
 }
 
 
-vim() {
-    if [[ -f $(which nvim) ]]; then
-        nvim $*
-    else
-        `which vim` $*
-    fi
-}
+# vim() {
+#     if [[ -f $(which nvim) ]]; then
+#         nvim $*
+#     else
+#         `which vim` $*
+#     fi
+# }
 
 authed_keys() {
     local fn=$1
