@@ -38,11 +38,17 @@ cons_path ~/local/racket/bin
 cons_path ~/local/rust/bin
 cons_path ~/local/node/bin
 cons_path ~/local/emacs/bin
+cons_path ~/local/oc
 cons_path ~/.cabal/bin
 cons_path $JAVA_HOME/bin
 cons_path ~/.local/bin
 cons_path ~/dotfiles/bin
 cons_path ~/bin
+
+# haskell stack bash completion support
+if [ -x $(which stack) ]; then
+	eval "$(stack --bash-completion-script stack)"
+fi
 
 if [ -d "~/local/perl5" ]; then
     export PERL5LIB="$HOME/local/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"
