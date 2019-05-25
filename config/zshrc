@@ -10,8 +10,9 @@ export ZSH_CUSTOM="$HOME/dotfiles/omz-custom"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 
-# use custom themes if found
-if [[ -f "$ZSH_CUSTOM/themes/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+# use custom themes if found; p10k if ZSH is new enough
+if [[ "$ZSH_VERSION" != 4.* ]] && [[ "$ZSH_VERSION" != 5.0.* ]] && \
+    [[ -f "$ZSH_CUSTOM/themes/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
     DEFAULT_USER=$USER
     #local nerdfonts=(~/.fonts/*Nerd*.ttf)
     #[[ ${#nerdfonts} > 0 ]] && \
