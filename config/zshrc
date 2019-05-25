@@ -8,7 +8,13 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="ys"
+
+# use my custom theme if we can find it
+if [[ -f "$ZSH/themes/ns.zsh-theme" ]]; then
+    ZSH_THEME="ns"
+else
+    ZSH_THEME="ys"
+fi
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -82,13 +88,8 @@ plugins=(
     #oc
 )
 
-if (($+commands[keychain])); then
-    plugins+=(keychain)
-fi
-
-if (($+commands[asadmin])); then
-    plugins+=(glassfish)
-fi
+(($+commands[keychain])) && plugins+=(keychain)
+(($+commands[asadmin])) && plugins+=(glassfish)
 
 zstyle :omz:plugins:keychain agents ssh
 zstyle :omz:plugins:keychain identities id_rsa 
