@@ -3,6 +3,7 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+export ZSH_CUSTOM="$HOME/dotfiles/omz-custom"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -10,7 +11,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 
 # use custom themes if found
-if [[ -f "$ZSH/custom/themes/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+if [[ -f "$ZSH_CUSTOM/themes/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
     DEFAULT_USER=$USER
     #local nerdfonts=(~/.fonts/*Nerd*.ttf)
     #[[ ${#nerdfonts} > 0 ]] && \
@@ -34,7 +35,7 @@ if [[ -f "$ZSH/custom/themes/powerlevel10k/powerlevel10k.zsh-theme" ]]; then
     #POWERLEVEL9K_SHORTEN_DELIMITER=''
     POWERLEVEL9K_SHORTEN_DELIMITER=''
     ZSH_THEME="powerlevel10k/powerlevel10k"
-elif [[ -f "$ZSH/custom/themes/ns.zsh-theme" ]]; then
+elif [[ -f "$ZSH_CUSTOM/themes/ns.zsh-theme" ]]; then
     ZSH_THEME="ns"
 else
     ZSH_THEME="ys"
