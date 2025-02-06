@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 massrename - rename a list of files with an editor
@@ -10,89 +10,95 @@ names as desired.  After the editor exits, the changes will
 be applied to the actual files.
 
 written 2004/04/24 by Nathan P. Stien
+updated 2025/02/06 for Python 3.8+
 """
 
-# vim: ts=4 sw=4 noet noai
+import os
+import sys
+import tempfile
+from typing import List, Optional
+import argparse
 
-# optparse rocks, as I have just discovered.
-import os, sys, warnings
-from optparse import OptionParser
-
-stderr = sys.stderr
-
-# i don't care about this warning
-warnings.filterwarnings('ignore', 
-    'tempnam is a potential security risk to your program',
-    RuntimeWarning)
-
-def verify_files(filenames):
+def verify_files(filenames: List[str]) -> bool:
+    """Verify that all supplied paths are files or directories."""
     for filename in filenames:
         if not os.path.isfile(filename) and not os.path.isdir(filename):
-            print >>stderr, 'Error: %s is not a file or directory!' % filename
+            print(f'Error: {filename} is not a file or directory!', file=sys.stderr)
             return False
     return True
 
-def ask_new_names(filenames, editor):
-    """ spawn an editor and get new names.  returns list of new names.
-    returns None on error. """
-
-    # build a text file with all the names
-    tempfilename = os.tempnam()
-    f = file(tempfilename, 'w')
-    f.write('\n'.join(filenames))
-    f.close()
+def ask_new_names(filenames: List[str], editor: str) -> Optional[List[str]]:
+    """Spawn an editor and get new names. Returns list of new names or None on error."""
     
-    os.system('%s %s' % (editor, tempfilename))
+    # Create a temporary file with all the names
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+        temp_file.write('\n'.join(filenames))
+        tempfilename = temp_file.name
     
-    newnames = []
-    for line in file(tempfilename):
-        newline = line.strip()
-        if len(newline):
-            newnames.append(newline)
-
-    os.unlink(tempfilename)
+    os.system(f'{editor} {tempfilename}')
     
-    if len(filenames) != len(newnames):
-        print >>stderr, 'Error: Counts of new and old filenames do not match!'
+    try:
+        with open(tempfilename) as f:
+            newnames = [line.strip() for line in f if line.strip()]
+        
+        os.unlink(tempfilename)
+        
+        if len(filenames) != len(newnames):
+            print('Error: Counts of new and old filenames do not match!', 
+                  file=sys.stderr)
+            return None
+        
+        return newnames
+    
+    except Exception as e:
+        print(f'Error reading temporary file: {e}', file=sys.stderr)
         return None
-    
-    return newnames
 
-def rename_list(oldnames, newnames, verbose = False, dry_run = False):
-    """ rename the files in oldnames to corresponding entries in newnames. """
+def rename_list(oldnames: List[str], newnames: List[str], 
+                verbose: bool = False, dry_run: bool = False) -> None:
+    """Rename the files in oldnames to corresponding entries in newnames."""
     assert len(oldnames) == len(newnames)
-    for idx in range(len(oldnames)):
+    for old, new in zip(oldnames, newnames):
         if verbose or dry_run:
-            print 'rename "%s" ->\n"%s"\n' % (oldnames[idx], newnames[idx])
+            print(f'rename "{old}" ->\n"{new}"\n')
         if not dry_run:
-            os.rename(oldnames[idx], newnames[idx])
+            try:
+                os.rename(old, new)
+            except OSError as e:
+                print(f'Error renaming "{old}" to "{new}": {e}', 
+                      file=sys.stderr)
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Rename multiple files using your text editor',
+        usage='%(prog)s [options] file0 [file1 [file2... [fileN]]]'
+    )
+
+    default_editor = os.environ.get('EDITOR', 'sensible-editor')
+
+    parser.add_argument('-e', '--editor',
+                       help='use this editor instead of default ($EDITOR or sensible-editor)',
+                       default=default_editor)
+    parser.add_argument('-v', '--verbose',
+                       action='store_true',
+                       help='show all rename operations')
+    parser.add_argument('-d', '--dry-run',
+                       action='store_true',
+                       help='only show what would be done, don\'t do it')
+    parser.add_argument('files',
+                       nargs='+',
+                       help='files to rename')
+
+    args = parser.parse_args()
+
+    if not verify_files(args.files):
+        sys.exit(1)
+
+    newnames = ask_new_names(args.files, args.editor)
+    if not newnames:
+        sys.exit(1)
+
+    rename_list(args.files, newnames, args.verbose, args.dry_run)
 
 if __name__ == '__main__':
-    usage = 'usage: %prog [options] file0 [file1 [file2... [fileN]]]'
-    parser = OptionParser(usage)
-
-    defaulteditor = os.environ.get('EDITOR', 'sensible-editor')
-
-    parser.add_option('-e', '--editor', dest='editor',
-                  help='use this editor instead of default ($EDITOR or sensible-editor)',
-          default=defaulteditor)
-    parser.add_option('-v', '--verbose',
-          action='store_true', dest='verbose', default=False,
-          help='show all rename operations')
-    parser.add_option('-d', '--dry-run',
-          action='store_true', dest='dry_run', default=False,
-          help='only show what would be done, don\'t do it.')
-
-    options, filenames = parser.parse_args()
-
-    if len(filenames) == 0:
-        parser.error('You need at least one file to do something.  Duh.')
-
-    if not verify_files(filenames):
-        sys.exit(-1)
-
-    newnames = ask_new_names(filenames, options.editor)
-    if not newnames:
-        sys.exit(-1)
-
-    rename_list(filenames, newnames, options.verbose, options.dry_run)
+    main()
